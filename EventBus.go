@@ -2,8 +2,6 @@ package eventBus
 
 import "sync"
 
-import "github.com/deckarep/golang-set"
-
 type EventBus interface {
 	Publisher
 	Subscriber
@@ -22,15 +20,15 @@ type Publisher interface {
 
 type Subscriber interface {
 	// 同步订阅主题
-	Subscribe(topic string, callback func(topic string, events ...interface{}) error, err error)
+	Subscribe(topic string, callback CallbackFunc, err error)
 	// 同步订阅一次
-	SubscribeOnce(topic string, callback func(topic string, events ...interface{}) error, err error)
+	SubscribeOnce(topic string, callback CallbackFunc, err error)
 	// 异步订阅主题
-	SubscribeAsync(topic string, callback func(topic string, events ...interface{}) error, err error)
+	SubscribeAsync(topic string, callback CallbackFunc, err error)
 	// 异步订阅一次
-	SubscribeOnceAsync(topic string, callback func(topic string, events ...interface{}) error, err error)
+	SubscribeOnceAsync(topic string, callback CallbackFunc, err error)
 	// 取消订阅
-	UnSubscribe(topic string, callback func(topic string, events ...interface{}) error, err error)
+	UnSubscribe(topic string, callback CallbackFunc, err error)
 }
 
 type eventBus struct {
@@ -39,8 +37,16 @@ type eventBus struct {
 	EventBus
 }
 
+type topic struct {
+	// todo 这里应该直接区分异步handlers和同步handlers
+	//  异步handlers用set底层实现
+	//  同步handlers用切片实现
+	handlers []eventHandler
+	lock     sync.RWMutex
+}
+
 type eventHandler struct {
-	callback func(topic string, events ...interface{}) error
+	callback CallbackFunc
 	flagOnce bool
 	async    bool
 }

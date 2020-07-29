@@ -18,12 +18,20 @@ var (
 )
 
 type callback struct {
-	Name string
-	Err  bool
+	Name      string
+	Err       bool
+	Recursion bool
 }
 
 func (callback *callback) Callback(topic string, events ...interface{}) error {
-	fmt.Println(fmt.Sprintf("%s# %s: %v", callback.Name, topic, events))
+	if len(events) == 0 {
+		fmt.Println(fmt.Sprintf("%s# %s: %v", callback.Name, topic, "Recursioned"))
+	} else {
+		fmt.Println(fmt.Sprintf("%s# %s: %v", callback.Name, topic, events))
+		if callback.Recursion {
+			testBus.Publish(topic)
+		}
+	}
 	if callback.Err {
 		return errors.New(callback.Name)
 	}
@@ -91,10 +99,6 @@ func TestUnSubSync(t *testing.T) {
 	}
 }
 
-func TestRecursionSub(t *testing.T) {
-
-}
-
 func TestUnSubAll(t *testing.T) {
 	TestSub(t)
 	TestSubAsync(t)
@@ -112,6 +116,21 @@ func TestUnSubAll(t *testing.T) {
 		testBus.WaitAsync()
 		testBus.UnSubscribeAll(callback)
 	}
+}
+
+func TestRecursionSub(t *testing.T) {
+	callbackRecursion := callback{
+		Name:      "Recursion",
+		Err:       false,
+		Recursion: true,
+	}
+	err := testBus.Subscribe(syncTopic, &callbackRecursion)
+	if err != nil {
+		t.Error("Recursion", err.Error())
+		return
+	}
+	testBus.Publish(syncTopic, "Recursion")
+	testBus.WaitAsync()
 }
 
 func TestMain(m *testing.M) {

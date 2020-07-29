@@ -4,6 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"gitee.com/super_step/eventBus"
+	"gitee.com/super_step/go_utils/logger"
+	"gitee.com/super_step/go_utils/myError"
+	"github.com/kataras/golog"
+	"github.com/kataras/pio"
+	"os"
 	"testing"
 )
 
@@ -25,9 +30,9 @@ type callback struct {
 
 func (callback *callback) Callback(topic string, events ...interface{}) error {
 	if len(events) == 0 {
-		fmt.Println(fmt.Sprintf("%s# %s: %v", callback.Name, topic, "Recursioned"))
+		golog.Default.Infof("%s# %s: %v", callback.Name, topic, "Recursioned")
 	} else {
-		fmt.Println(fmt.Sprintf("%s# %s: %v", callback.Name, topic, events))
+		golog.Default.Infof("%s# %s: %v", callback.Name, topic, events)
 		if callback.Recursion {
 			testBus.Publish(topic)
 		}
@@ -46,7 +51,10 @@ func TestSub(t *testing.T) {
 			return
 		}
 		err = testBus.Subscribe(syncTopic, callback)
-		if err == nil {
+		if err != nil {
+			err = myError.Warp(err, "%d#", index)
+			golog.Default.Error(err.Error())
+		} else {
 			t.Error("重复订阅未报告异常")
 			return
 		}
@@ -79,8 +87,22 @@ func TestPublish(t *testing.T) {
 }
 
 func TestPublishSync(t *testing.T) {
-	testBus.PublishSync(syncTopic, "PublishSync")
-	testBus.PublishSync(asyncTopic, "PublishSync")
+	err := testBus.PublishSync(syncTopic, "PublishSync")
+	if err != nil {
+		golog.Default.Error(err.Error())
+	}
+	err = testBus.PublishSyncNoWait(syncTopic, "PublishSync")
+	if err != nil {
+		golog.Default.Error(err.Error())
+	}
+	err = testBus.PublishSync(asyncTopic, "PublishSync")
+	if err != nil {
+		golog.Default.Error(err.Error())
+	}
+	err = testBus.PublishSyncNoWait(asyncTopic, "PublishSync")
+	if err != nil {
+		golog.Default.Error(err.Error())
+	}
 }
 
 func TestUnSubAsync(t *testing.T) {
@@ -134,9 +156,13 @@ func TestRecursionSub(t *testing.T) {
 }
 
 func TestMain(m *testing.M) {
-	testBus = eventBus.NewBus()
+	golog.Default.Printer = pio.NewPrinter("", os.Stdout).
+		EnableDirectOutput().Hijack(logger.Hijacker).SetSync(false)
+	golog.Default.SetTimeFormat("2006-01-02 15:04:05")
+	golog.Default.SetLevel("debug")
+	testBus = eventBus.NewBus(golog.Default)
 	for i := 0; i < 4; i++ {
-		callbackStruck := newCallback(fmt.Sprintf("%d#", i), i == 2)
+		callbackStruck := newCallback(fmt.Sprintf("%d", i), i == 2)
 		callbacks = append(callbacks, callbackStruck)
 	}
 	m.Run()

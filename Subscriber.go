@@ -2,6 +2,7 @@ package eventBus
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"sync"
 )
@@ -45,7 +46,7 @@ func (bus *eventBus) UnSubscribeAll(callback Callback) {
 func (bus *eventBus) subscribe(topic string, callback Callback, async bool) error {
 	Topic := bus.getTopic(topic)
 	if checkSub(Topic, callback) {
-		return errors.New("不能重复订阅")
+		return errors.New(fmt.Sprintf("topic:%s 重复订阅 ", topic))
 	}
 	if async {
 		reflectCallback := reflect.ValueOf(callback)

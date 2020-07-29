@@ -24,8 +24,12 @@ type Controller interface {
 }
 
 type Publisher interface {
+	// 发布
 	Publish(topic string, events ...interface{})
-	PublishSync(topic string, events ...interface{})
+	// 同步发布
+	PublishSync(topic string, events ...interface{}) error
+	// 同步发布, 不等待异步调用完成
+	PublishSyncNoWait(topic string, events ...interface{}) error
 }
 
 type Subscriber interface {
@@ -42,7 +46,7 @@ type Subscriber interface {
 type eventBus struct {
 	topicMap sync.Map
 	wg       sync.WaitGroup
-	Logger   *golog.Logger
+	logger   *golog.Logger
 	EventBus
 }
 
@@ -59,8 +63,9 @@ type topic struct {
 	sync.RWMutex
 }
 
-func NewBus() EventBus {
+func NewBus(logger *golog.Logger) EventBus {
 	return &eventBus{
 		topicMap: sync.Map{},
+		logger:   logger,
 	}
 }

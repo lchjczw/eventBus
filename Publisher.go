@@ -33,14 +33,14 @@ func (bus *eventBus) publishSync(topic string, events ...interface{}) {
 // 执行同步订阅回调
 func (bus *eventBus) callSync(topic string, events []interface{}, Topic *topic) {
 	Topic.RLock()
-	syncHandlers := make([]CallbackFunc, len(Topic.syncHandlers))
+	syncHandlers := make([]Callback, len(Topic.syncHandlers))
 	if len(Topic.syncHandlers) > 0 {
 		copy(syncHandlers, Topic.syncHandlers)
 	}
 	Topic.RUnlock()
 	for _, syncHandler := range syncHandlers {
 		// fmt.Println(syncHandler)
-		err := syncHandler(topic, events...)
+		err := syncHandler.Callback(topic, events...)
 		if err != nil {
 			if Topic.transaction {
 				return
@@ -63,7 +63,8 @@ func (bus *eventBus) callAsync(topic string, events []interface{}, Topic *topic)
 				for _, event := range events {
 					params = append(params, reflect.ValueOf(event))
 				}
-				callback.Call(params)
+				callbackFunc := callback.MethodByName("Callback")
+				callbackFunc.Call(params)
 				Topic.wg.Done()
 			}()
 		}

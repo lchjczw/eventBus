@@ -7,17 +7,17 @@ import (
 )
 
 // 同步订阅主题
-func (bus *eventBus) Subscribe(topic string, callback CallbackFunc) error {
+func (bus *eventBus) Subscribe(topic string, callback Callback) error {
 	return bus.subscribe(topic, callback, false)
 }
 
 // 异步订阅主题
-func (bus *eventBus) SubscribeAsync(topic string, callback CallbackFunc) error {
+func (bus *eventBus) SubscribeAsync(topic string, callback Callback) error {
 	return bus.subscribe(topic, callback, true)
 }
 
 // 取消订阅
-func (bus *eventBus) UnSubscribe(topic string, callback CallbackFunc) {
+func (bus *eventBus) UnSubscribe(topic string, callback Callback) {
 	Topic := bus.getTopic(topic)
 	reflectCallback := reflect.ValueOf(callback)
 	if Topic.asyncHandlers.Contains(reflectCallback) {
@@ -33,18 +33,16 @@ func (bus *eventBus) UnSubscribe(topic string, callback CallbackFunc) {
 	Topic.Unlock()
 }
 
-// todo 取消所有订阅
-// func (bus *eventBus) UnSubscribeAll(callback CallbackFunc) {
-//
-// }
-
-// todo 订阅当前所有频道
-// func (bus *eventBus) SubscribeAll(callback CallbackFunc) {
-//
-// }
+// 取消所有订阅
+func (bus *eventBus) UnSubscribeAll(callback Callback) {
+	bus.topicMap.Range(func(topic, Topic interface{}) bool {
+		bus.UnSubscribe(topic.(string), callback)
+		return true
+	})
+}
 
 // 订阅
-func (bus *eventBus) subscribe(topic string, callback CallbackFunc, async bool) error {
+func (bus *eventBus) subscribe(topic string, callback Callback, async bool) error {
 	Topic := bus.getTopic(topic)
 	if checkSub(Topic, callback) {
 		return errors.New("不能重复订阅")
@@ -60,7 +58,7 @@ func (bus *eventBus) subscribe(topic string, callback CallbackFunc, async bool) 
 	return nil
 }
 
-func checkSub(topic *topic, callback CallbackFunc) bool {
+func checkSub(topic *topic, callback Callback) bool {
 	reflectCallback := reflect.ValueOf(callback)
 	if topic.asyncHandlers.Contains(reflectCallback) {
 		return true
@@ -68,7 +66,7 @@ func checkSub(topic *topic, callback CallbackFunc) bool {
 	return checkSyncSub(topic.syncHandlers, callback, topic.RLocker())
 }
 
-func checkSyncSub(handlers []CallbackFunc, callback CallbackFunc, rMutex sync.Locker) bool {
+func checkSyncSub(handlers []Callback, callback Callback, rMutex sync.Locker) bool {
 	rMutex.Lock()
 	defer rMutex.Unlock()
 	if findCallback(handlers, callback) > -1 {
@@ -78,7 +76,7 @@ func checkSyncSub(handlers []CallbackFunc, callback CallbackFunc, rMutex sync.Lo
 }
 
 // 必须在读或写锁保护的情况下调用
-func findCallback(handlers []CallbackFunc, callback CallbackFunc) int {
+func findCallback(handlers []Callback, callback Callback) int {
 	for i, subFun := range handlers {
 		if isSameFunc(subFun, callback) {
 			return i
@@ -88,7 +86,7 @@ func findCallback(handlers []CallbackFunc, callback CallbackFunc) int {
 }
 
 // 必须在写锁保护的情况下调用
-func removeFromSync(slice []CallbackFunc, index int) (result []CallbackFunc) {
+func removeFromSync(slice []Callback, index int) (result []Callback) {
 	if index == 0 {
 		result = slice[1:]
 	} else {

@@ -8,111 +8,126 @@ import (
 )
 
 const (
-	testTopic = "testTopic"
+	syncTopic  = "syncTopic"
+	asyncTopic = "asyncTopic"
 )
 
-var testBus eventBus.EventBus
+var (
+	testBus   eventBus.EventBus
+	callbacks []eventBus.Callback
+)
 
-func syncCallbackError(topic string, events ...interface{}) error {
-	fmt.Println(fmt.Sprintf("sync# %s: %v", topic, events))
-	return errors.New("test")
+type callback struct {
+	Name string
+	Err  bool
 }
 
-func syncCallback(topic string, events ...interface{}) error {
-	fmt.Println(fmt.Sprintf("sync# %s: %v", topic, events))
-	return nil
-}
-
-func syncCallback1(topic string, events ...interface{}) error {
-	fmt.Println(fmt.Sprintf("sync# %s: %v", topic, events))
-	return nil
-}
-
-func asyncCallback(topic string, events ...interface{}) error {
-	fmt.Println(fmt.Sprintf("async# %s: %v", topic, events))
+func (callback *callback) Callback(topic string, events ...interface{}) error {
+	fmt.Println(fmt.Sprintf("%s# %s: %v", callback.Name, topic, events))
+	if callback.Err {
+		return errors.New(callback.Name)
+	}
 	return nil
 }
 
 func TestSub(t *testing.T) {
-	err := testBus.Subscribe(testTopic, syncCallbackError)
-	if err != nil {
-		t.Error(err.Error())
-		return
-	}
-	err = testBus.Subscribe(testTopic, syncCallbackError)
-	if err == nil {
-		t.Error("重复订阅")
-		return
-	}
-
-	err = testBus.Subscribe(testTopic, syncCallback)
-	if err != nil {
-		t.Error(err.Error())
-		return
-	}
-	err = testBus.Subscribe(testTopic, syncCallback)
-	if err == nil {
-		t.Error("重复订阅")
-		return
-	}
-
-	err = testBus.Subscribe(testTopic, syncCallback1)
-	if err != nil {
-		t.Error(err.Error())
-		return
-	}
-	err = testBus.Subscribe(testTopic, syncCallback1)
-	if err == nil {
-		t.Error("重复订阅")
-		return
+	for index, callback := range callbacks {
+		err := testBus.Subscribe(syncTopic, callback)
+		if err != nil {
+			t.Error(index, err.Error())
+			return
+		}
+		err = testBus.Subscribe(syncTopic, callback)
+		if err == nil {
+			t.Error("重复订阅未报告异常")
+			return
+		}
 	}
 }
 
 func TestSubAsync(t *testing.T) {
-	err := testBus.SubscribeAsync(testTopic, asyncCallback)
-	if err != nil {
-		t.Error(err.Error())
-		return
-	}
-	err = testBus.SubscribeAsync(testTopic, asyncCallback)
-	if err == nil {
-		t.Error("重复订阅")
-		return
+	for index, callback := range callbacks {
+		err := testBus.SubscribeAsync(asyncTopic, callback)
+		if err != nil {
+			t.Error(index, err.Error())
+			return
+		}
+		err = testBus.SubscribeAsync(asyncTopic, callback)
+		if err == nil {
+			t.Error("重复订阅未报告异常")
+			return
+		}
 	}
 }
 
 func TestPublish(t *testing.T) {
-	testBus.SetTransaction(testTopic, false)
-	testBus.Publish(testTopic, "not tr")
-	testBus.SetTransaction(testTopic, true)
-	testBus.Publish(testTopic, "tr")
+	testBus.SetTransaction(syncTopic, true)
+	testBus.Publish(syncTopic, "publish test", "transaction")
+	testBus.WaitAsync()
+	testBus.SetTransaction(syncTopic, false)
+	testBus.Publish(syncTopic, "publish test")
+	testBus.Publish(asyncTopic, "publish test")
+	testBus.WaitAsync()
 }
 
 func TestPublishSync(t *testing.T) {
-	testBus.PublishSync(testTopic, "PublishSync")
+	testBus.PublishSync(syncTopic, "PublishSync")
+	testBus.PublishSync(asyncTopic, "PublishSync")
 }
 
 func TestUnSubAsync(t *testing.T) {
-	testBus.UnSubscribe(testTopic, asyncCallback)
-	testBus.Publish(testTopic, "UnSubAsync")
+	for index, callback := range callbacks {
+		testBus.Publish(syncTopic, "Sync", "UnSub", index)
+		testBus.WaitAsync()
+		testBus.UnSubscribe(syncTopic, callback)
+	}
 }
 
 func TestUnSubSync(t *testing.T) {
-	testBus.UnSubscribe(testTopic, syncCallback1)
-	testBus.Publish(testTopic, "UnSubSync", "callback1")
-	testBus.WaitAsync()
-	testBus.UnSubscribe(testTopic, syncCallback)
-	testBus.Publish(testTopic, "UnSubSync", "callback")
-	testBus.WaitAsync()
-	testBus.UnSubscribe(testTopic, syncCallbackError)
-	testBus.PublishSync(testTopic, "UnSubSync", "callbackError")
+	for index, callback := range callbacks {
+		testBus.Publish(asyncTopic, "Async", "UnSub", index)
+		testBus.WaitAsync()
+		testBus.UnSubscribe(asyncTopic, callback)
+	}
 }
 
-func TestWait(t *testing.T) {
-	testBus.WaitAsync()
+func TestRecursionSub(t *testing.T) {
+
+}
+
+func TestUnSubAll(t *testing.T) {
+	TestSub(t)
+	TestSubAsync(t)
+	length := len(callbacks)
+	for i := 1; i <= length; i++ {
+		testBus.Publish(asyncTopic, "Async", "UnSubAll", i)
+		testBus.Publish(syncTopic, "Sync", "UnSubAll", i)
+		testBus.WaitAsync()
+		testBus.UnSubscribeAll(callbacks[length-i])
+	}
+
+	for index, callback := range callbacks {
+		testBus.Publish(asyncTopic, "Async", "UnSubAll", index)
+		testBus.Publish(syncTopic, "Sync", "UnSubAll", index)
+		testBus.WaitAsync()
+		testBus.UnSubscribeAll(callback)
+	}
 }
 
 func TestMain(m *testing.M) {
 	testBus = eventBus.NewBus()
+	for i := 0; i < 4; i++ {
+		callbackStruck := newCallback(fmt.Sprintf("%d#", i), i == 2)
+		callbacks = append(callbacks, callbackStruck)
+	}
 	m.Run()
+	testBus.WaitAsync()
+}
+
+func newCallback(name string, err bool) eventBus.Callback {
+	callbackStruck := callback{
+		Name: name,
+		Err:  err,
+	}
+	return &callbackStruck
 }

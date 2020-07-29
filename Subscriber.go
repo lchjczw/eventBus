@@ -17,7 +17,7 @@ func (bus *eventBus) SubscribeAsync(topic string, callback CallbackFunc) error {
 
 // 取消订阅
 func (bus *eventBus) UnSubscribe(topic string, callback CallbackFunc) {
-	Topic := getTopic(topic)
+	Topic := bus.getTopic(topic)
 	if Topic.asyncHandlers.Contains(callback) {
 		Topic.asyncHandlers.Remove(callback)
 		return
@@ -32,7 +32,7 @@ func (bus *eventBus) UnSubscribe(topic string, callback CallbackFunc) {
 
 // 订阅
 func (bus *eventBus) subscribe(topic string, callback CallbackFunc, async bool) error {
-	Topic := getTopic(topic)
+	Topic := bus.getTopic(topic)
 	if checkSub(Topic, callback) {
 		return errors.New("不能重复订阅")
 	}

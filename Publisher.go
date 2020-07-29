@@ -22,7 +22,7 @@ func (bus *eventBus) publish(topic string, events ...interface{}) {
 }
 
 func (bus *eventBus) publishSync(topic string, events ...interface{}) {
-	Topic := getTopic(topic)
+	Topic := bus.getTopic(topic)
 	bus.callAsync(topic, events, Topic.asyncHandlers)
 	bus.callSync(topic, events, Topic)
 }

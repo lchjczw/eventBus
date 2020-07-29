@@ -7,7 +7,7 @@ import (
 )
 
 func (bus *eventBus) HasSubscribed(topic string) bool {
-	return hasSubscribed(topic)
+	return bus.hasSubscribed(topic)
 }
 
 func (bus *eventBus) SetTransaction(topicName string, tr bool) bool {
@@ -23,8 +23,8 @@ func (bus *eventBus) WaitAsync() {
 	bus.wg.Wait()
 }
 
-func hasSubscribed(topic string) bool {
-	Topic := getTopic(topic)
+func (bus *eventBus) hasSubscribed(topic string) bool {
+	Topic := bus.getTopic(topic)
 	if Topic.asyncHandlers.Cardinality() > 0 {
 		return true
 	}
@@ -36,7 +36,7 @@ func hasSubscribed(topic string) bool {
 	return false
 }
 
-func getTopic(topicName string) (resTopic *topic) {
+func (bus *eventBus) getTopic(topicName string) (resTopic *topic) {
 	res, find := bus.topicMap.LoadOrStore(topicName, resTopic)
 	if find && res != nil {
 		resTopic = res.(*topic)

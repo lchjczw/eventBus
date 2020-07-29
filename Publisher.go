@@ -1,6 +1,8 @@
 package eventBus
 
-import mapset "github.com/deckarep/golang-set"
+import (
+	"reflect"
+)
 
 // 异步发布
 func (bus *eventBus) Publish(topic string, events ...interface{}) {
@@ -23,19 +25,21 @@ func (bus *eventBus) publish(topic string, events ...interface{}) {
 
 func (bus *eventBus) publishSync(topic string, events ...interface{}) {
 	Topic := bus.getTopic(topic)
-	bus.callAsync(topic, events, Topic.asyncHandlers)
+	bus.callAsync(topic, events, Topic)
 	bus.callSync(topic, events, Topic)
+	Topic.wg.Wait()
 }
 
 // 执行同步订阅回调
 func (bus *eventBus) callSync(topic string, events []interface{}, Topic *topic) {
-	syncHandlers := make([]CallbackFunc, 0)
 	Topic.RLock()
+	syncHandlers := make([]CallbackFunc, len(Topic.syncHandlers))
 	if len(Topic.syncHandlers) > 0 {
-		_ = clone(syncHandlers, Topic.syncHandlers)
+		copy(syncHandlers, Topic.syncHandlers)
 	}
 	Topic.RUnlock()
 	for _, syncHandler := range syncHandlers {
+		// fmt.Println(syncHandler)
 		err := syncHandler(topic, events...)
 		if err != nil {
 			if Topic.transaction {
@@ -46,12 +50,21 @@ func (bus *eventBus) callSync(topic string, events []interface{}, Topic *topic) 
 }
 
 // 执行异步订阅回调
-func (bus *eventBus) callAsync(topic string, events []interface{}, asyncHandlers mapset.Set) {
-	for _, asyncHandler := range asyncHandlers.ToSlice() {
-		callback, ok := asyncHandler.(CallbackFunc)
+func (bus *eventBus) callAsync(topic string, events []interface{}, Topic *topic) {
+	for _, asyncHandler := range Topic.asyncHandlers.ToSlice() {
+		callback, ok := asyncHandler.(reflect.Value)
 		if ok {
+			Topic.wg.Add(1)
 			go func() {
-				_ = callback(topic, events...)
+				// 通过反射调用
+				params := []reflect.Value{
+					reflect.ValueOf(topic),
+				}
+				for _, event := range events {
+					params = append(params, reflect.ValueOf(event))
+				}
+				callback.Call(params)
+				Topic.wg.Done()
 			}()
 		}
 	}

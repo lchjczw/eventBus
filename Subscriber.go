@@ -2,6 +2,7 @@ package eventBus
 
 import (
 	"errors"
+	"reflect"
 	"sync"
 )
 
@@ -18,8 +19,9 @@ func (bus *eventBus) SubscribeAsync(topic string, callback CallbackFunc) error {
 // 取消订阅
 func (bus *eventBus) UnSubscribe(topic string, callback CallbackFunc) {
 	Topic := bus.getTopic(topic)
-	if Topic.asyncHandlers.Contains(callback) {
-		Topic.asyncHandlers.Remove(callback)
+	reflectCallback := reflect.ValueOf(callback)
+	if Topic.asyncHandlers.Contains(reflectCallback) {
+		Topic.asyncHandlers.Remove(reflectCallback)
 		return
 	}
 	Topic.Lock()
@@ -27,8 +29,19 @@ func (bus *eventBus) UnSubscribe(topic string, callback CallbackFunc) {
 	if index > -1 {
 		Topic.syncHandlers = removeFromSync(Topic.syncHandlers, index)
 	}
+	// bus.topicMap.Store(topic, Topic)
 	Topic.Unlock()
 }
+
+// todo 取消所有订阅
+// func (bus *eventBus) UnSubscribeAll(callback CallbackFunc) {
+//
+// }
+
+// todo 订阅当前所有频道
+// func (bus *eventBus) SubscribeAll(callback CallbackFunc) {
+//
+// }
 
 // 订阅
 func (bus *eventBus) subscribe(topic string, callback CallbackFunc, async bool) error {
@@ -37,14 +50,10 @@ func (bus *eventBus) subscribe(topic string, callback CallbackFunc, async bool) 
 		return errors.New("不能重复订阅")
 	}
 	if async {
-		Topic.asyncHandlers.Add(callback)
+		reflectCallback := reflect.ValueOf(callback)
+		Topic.asyncHandlers.Add(reflectCallback)
 	} else {
 		Topic.Lock()
-		for _, subFun := range Topic.syncHandlers {
-			if isSameFunc(subFun, callback) {
-				break
-			}
-		}
 		Topic.syncHandlers = append(Topic.syncHandlers, callback)
 		Topic.Unlock()
 	}
@@ -52,7 +61,8 @@ func (bus *eventBus) subscribe(topic string, callback CallbackFunc, async bool) 
 }
 
 func checkSub(topic *topic, callback CallbackFunc) bool {
-	if topic.asyncHandlers.Contains(callback) {
+	reflectCallback := reflect.ValueOf(callback)
+	if topic.asyncHandlers.Contains(reflectCallback) {
 		return true
 	}
 	return checkSyncSub(topic.syncHandlers, callback, topic.RLocker())
@@ -79,11 +89,8 @@ func findCallback(handlers []CallbackFunc, callback CallbackFunc) int {
 
 // 必须在写锁保护的情况下调用
 func removeFromSync(slice []CallbackFunc, index int) (result []CallbackFunc) {
-	sliceLength := len(slice)
 	if index == 0 {
-		result = slice[index+1:]
-	} else if index == sliceLength {
-		result = slice[:index]
+		result = slice[1:]
 	} else {
 		result = append(slice[:index], slice[index+1:]...)
 	}

@@ -1,7 +1,7 @@
 package eventBus
 
 import (
-	mapset "github.com/deckarep/golang-set"
+	mapSet "github.com/deckarep/golang-set"
 	"sync"
 )
 
@@ -12,9 +12,9 @@ type EventBus interface {
 }
 
 type Controller interface {
-	HasSubscribed(topic string) bool
+	// HasSubscribed(topic string) bool
 	WaitAsync()
-	SetTransaction(topic string, tr bool) bool
+	SetTransaction(topic string, tr bool)
 }
 
 type Publisher interface {
@@ -25,12 +25,8 @@ type Publisher interface {
 type Subscriber interface {
 	// 同步订阅主题
 	Subscribe(topic string, callback CallbackFunc) error
-	// 同步订阅一次
-	// SubscribeOnce(topic string, callback CallbackFunc, err error)
 	// 异步订阅主题
 	SubscribeAsync(topic string, callback CallbackFunc) error
-	// 异步订阅一次
-	// SubscribeOnceAsync(topic string, callback CallbackFunc, err error)
 	// 取消订阅
 	UnSubscribe(topic string, callback CallbackFunc)
 }
@@ -48,8 +44,9 @@ type topic struct {
 	//  异步handlers用set底层实现
 	//  同步handlers用切片实现
 	syncHandlers  []CallbackFunc
-	asyncHandlers mapset.Set
+	asyncHandlers mapSet.Set
 	transaction   bool
+	wg            sync.WaitGroup
 	sync.RWMutex
 }
 

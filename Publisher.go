@@ -24,6 +24,11 @@ func (bus *eventBus) PublishSyncNoWait(topic string, events ...interface{}) erro
 	return bus.publishSync(topic, false, events...)
 }
 
+func (bus *eventBus) CloseTopic(topic string) {
+	bus.topicMap.Delete(topic)
+	return
+}
+
 func (bus *eventBus) publish(topic string, events ...interface{}) {
 	_ = bus.publishSync(topic, true, events...)
 	bus.wg.Done()

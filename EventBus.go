@@ -21,6 +21,8 @@ type Controller interface {
 	WaitAsync()
 	// 设置同步订阅事务标记
 	SetTransaction(topic string, tr bool)
+	// 关闭主题
+	CloseTopic(topic string)
 }
 
 type Publisher interface {

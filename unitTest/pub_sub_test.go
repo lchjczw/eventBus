@@ -15,6 +15,7 @@ import (
 const (
 	syncTopic  = "syncTopic"
 	asyncTopic = "asyncTopic"
+	closeTopic = "closeTopic"
 )
 
 var (
@@ -152,6 +153,17 @@ func TestRecursionSub(t *testing.T) {
 		return
 	}
 	testBus.Publish(syncTopic, "Recursion")
+	testBus.WaitAsync()
+	testBus.UnSubscribe(syncTopic, &callbackRecursion)
+}
+
+func TestCloseTopic(t *testing.T) {
+	TestSub(t)
+	TestSubAsync(t)
+	testBus.Publish(syncTopic, "BeforeClose")
+	testBus.WaitAsync()
+	testBus.CloseTopic(syncTopic)
+	testBus.Publish(syncTopic, "Closed")
 	testBus.WaitAsync()
 }
 

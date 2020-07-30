@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"gitee.com/super_step/eventBus"
 	"gitee.com/super_step/go_utils/logger"
-	"gitee.com/super_step/go_utils/myError"
 	"github.com/kataras/golog"
 	"github.com/kataras/pio"
 	"os"
@@ -52,10 +51,7 @@ func TestSub(t *testing.T) {
 			return
 		}
 		err = testBus.Subscribe(syncTopic, callback)
-		if err != nil {
-			err = myError.Warp(err, "%d#", index)
-			golog.Default.Error(err.Error())
-		} else {
+		if err == nil {
 			t.Error("重复订阅未报告异常")
 			return
 		}

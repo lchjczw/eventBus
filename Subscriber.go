@@ -88,10 +88,6 @@ func findCallback(handlers []Callback, callback Callback) int {
 
 // 必须在写锁保护的情况下调用
 func removeFromSync(slice []Callback, index int) (result []Callback) {
-	if index == 0 {
-		result = slice[1:]
-	} else {
-		result = append(slice[:index], slice[index+1:]...)
-	}
+	result = append(slice[:index], slice[index+1:]...)
 	return
 }

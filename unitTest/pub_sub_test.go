@@ -14,7 +14,6 @@ import (
 const (
 	syncTopic  = "syncTopic"
 	asyncTopic = "asyncTopic"
-	closeTopic = "closeTopic"
 )
 
 var (

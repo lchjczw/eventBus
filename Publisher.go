@@ -1,6 +1,7 @@
 package eventBus
 
 import (
+	"context"
 	"reflect"
 )
 
@@ -36,20 +37,30 @@ func (bus *eventBus) publish(topic string, events ...interface{}) {
 }
 
 func (bus *eventBus) publishSync(topic string, wait bool, events ...interface{}) error {
+	publishContext := context.Background()
 	Topic := bus.getTopic(topic)
-	bus.callAsync(topic, events, Topic)
-	err := bus.callSync(topic, events, Topic)
+	if Topic.beforeCallback != nil {
+		Topic.beforeCallback(publishContext)
+	}
+	bus.callAsync(topic, publishContext, events, Topic)
+	err := bus.callSync(topic, publishContext, events, Topic)
+	if Topic.afterSyncCallback != nil {
+		Topic.afterSyncCallback(publishContext)
+	}
 	if err != nil {
 		return err
 	}
 	if wait {
 		Topic.wg.Wait()
 	}
+	if Topic.afterCallback != nil {
+		Topic.afterCallback(publishContext)
+	}
 	return err
 }
 
 // 执行同步订阅回调
-func (bus *eventBus) callSync(topic string, events []interface{}, Topic *topic) error {
+func (bus *eventBus) callSync(topic string, ctx context.Context, events []interface{}, Topic *topic) error {
 	Topic.RLock()
 	syncHandlers := make([]Callback, len(Topic.syncHandlers))
 	if len(Topic.syncHandlers) > 0 {
@@ -59,7 +70,7 @@ func (bus *eventBus) callSync(topic string, events []interface{}, Topic *topic) 
 	var tmpErr error
 	for _, syncHandler := range syncHandlers {
 		// fmt.Println(syncHandler)
-		err := syncHandler.Callback(topic, events...)
+		err := syncHandler.Callback(topic, ctx, events...)
 		if err != nil {
 			bus.logger.Errorf("eventBus(sync): %s%v#%s", topic, events, err.Error())
 			if Topic.transaction {
@@ -73,7 +84,7 @@ func (bus *eventBus) callSync(topic string, events []interface{}, Topic *topic) 
 }
 
 // 执行异步订阅回调
-func (bus *eventBus) callAsync(topic string, events []interface{}, Topic *topic) {
+func (bus *eventBus) callAsync(topic string, ctx context.Context, events []interface{}, Topic *topic) {
 	for _, asyncHandler := range Topic.asyncHandlers.ToSlice() {
 		callback, ok := asyncHandler.(reflect.Value)
 		if ok {
@@ -82,6 +93,7 @@ func (bus *eventBus) callAsync(topic string, events []interface{}, Topic *topic)
 				// 通过反射调用
 				params := []reflect.Value{
 					reflect.ValueOf(topic),
+					reflect.ValueOf(ctx),
 				}
 				for _, event := range events {
 					params = append(params, reflect.ValueOf(event))

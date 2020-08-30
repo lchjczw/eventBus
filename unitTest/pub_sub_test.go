@@ -1,6 +1,7 @@
 package unitTest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"gitee.com/super_step/eventBus"
@@ -27,7 +28,7 @@ type callback struct {
 	Recursion bool
 }
 
-func (callback *callback) Callback(topic string, events ...interface{}) error {
+func (callback *callback) Callback(topic string, ctx context.Context, events ...interface{}) error {
 	if len(events) == 0 {
 		golog.Default.Infof("%s# %s: %v", callback.Name, topic, "Recursioned")
 	} else {

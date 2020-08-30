@@ -1,6 +1,7 @@
 package eventBus
 
 import (
+	"context"
 	mapSet "github.com/deckarep/golang-set"
 	"github.com/kataras/golog"
 	"sync"
@@ -10,10 +11,13 @@ type EventBus interface {
 	Publisher
 	Subscriber
 	Controller
+	Cycle
 }
 
-type Callback interface {
-	Callback(topic string, events ...interface{}) error
+type Cycle interface {
+	SetCycleBefore(topic string, callback CycleCallback)
+	SetCycleAfterSync(topic string, callback CycleCallback)
+	SetCycleAfterAll(topic string, callback CycleCallback)
 }
 
 type Controller interface {
@@ -34,6 +38,10 @@ type Publisher interface {
 	PublishSyncNoWait(topic string, events ...interface{}) error
 }
 
+type Callback interface {
+	Callback(topic string, ctx context.Context, events ...interface{}) error
+}
+
 type Subscriber interface {
 	// 同步订阅主题
 	Subscribe(topic string, callback Callback) error
@@ -44,6 +52,11 @@ type Subscriber interface {
 	// 取消所有已订阅的主题
 	UnSubscribeAll(callback Callback)
 }
+
+// 因为会导致重复订阅,所以必须用interface的形式
+// type Callback = func(string, context.Context, ...interface{}) error
+
+type CycleCallback = func(ctx context.Context)
 
 type eventBus struct {
 	topicMap sync.Map
@@ -58,10 +71,13 @@ type topic struct {
 	// 区分异步handlers和同步handlers
 	//  异步handlers用set底层实现
 	//  同步handlers用切片实现
-	syncHandlers  []Callback
-	asyncHandlers mapSet.Set
-	transaction   bool
-	wg            sync.WaitGroup
+	syncHandlers      []Callback
+	asyncHandlers     mapSet.Set
+	transaction       bool
+	wg                sync.WaitGroup
+	beforeCallback    CycleCallback
+	afterSyncCallback CycleCallback
+	afterCallback     CycleCallback
 	sync.RWMutex
 }
 

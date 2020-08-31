@@ -16,7 +16,7 @@ type EventBus interface {
 
 type Cycle interface {
 	// 设置发布时回调
-	SetCycleBefore(topic string, callback CycleCallback)
+	SetCycleBefore(topic string, callback BeforeCallback)
 	// 设置同步完成时回调
 	SetCycleAfterSync(topic string, callback CycleCallback)
 	// 设置全部完成时回调
@@ -61,6 +61,7 @@ type Callback interface {
 }
 
 type CycleCallback = func(topic string, ctx *memstore.Store, events ...interface{})
+type BeforeCallback = func(topic string, ctx *memstore.Store, events ...interface{}) error
 type ErrorCallback = func(topic string, ctx *memstore.Store, err error, events ...interface{})
 
 type eventBus struct {
@@ -79,7 +80,7 @@ type topic struct {
 	syncHandlers      []Callback
 	asyncHandlers     mapSet.Set
 	transaction       bool
-	beforeCallback    CycleCallback
+	beforeCallback    BeforeCallback
 	afterSyncCallback CycleCallback
 	afterCallback     CycleCallback
 	onErrorCallback   ErrorCallback

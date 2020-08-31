@@ -1,6 +1,7 @@
 package eventBus
 
 import (
+	"gitee.com/super_step/go_utils/myError"
 	"github.com/kataras/iris/v12/core/memstore"
 	"reflect"
 	"sync"
@@ -44,7 +45,12 @@ func (bus *eventBus) publishSync(topic string, wait bool, events ...interface{})
 	publishStore.Set("waitGroup", wg)
 	Topic := bus.getTopic(topic)
 	if Topic.beforeCallback != nil {
-		Topic.beforeCallback(topic, publishStore, events...)
+		err := Topic.beforeCallback(topic, publishStore, events...)
+		if err != nil {
+			err = myError.Warp(err, "前置生命周期出错, 流程停止")
+			bus.wg.Done()
+			return err
+		}
 	}
 	bus.callAsync(topic, publishStore, events, Topic)
 	err := bus.callSync(topic, publishStore, events, Topic)

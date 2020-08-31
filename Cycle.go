@@ -1,6 +1,6 @@
 package eventBus
 
-func (bus *eventBus) SetCycleBefore(topic string, callback CycleCallback) {
+func (bus *eventBus) SetCycleBefore(topic string, callback BeforeCallback) {
 	Topic := bus.getTopic(topic)
 	Topic.beforeCallback = callback
 }

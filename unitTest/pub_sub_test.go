@@ -30,22 +30,34 @@ type callback struct {
 }
 
 type cycle struct {
-	BeforeFlag    bool
-	AfterFlag     bool
-	AfterSyncFlag bool
-	OnErrorFlag   bool
-	StoreCount    int
+	BeforeFlag      bool
+	AfterFlag       bool
+	AfterSyncFlag   bool
+	OnErrorFlag     bool
+	StoreCount      int
+	BeforeErrorFlag bool
+	AfterCount      int
+	AfterSyncCount  int
 }
 
-func (cycle *cycle) OnBefore(topic string, ctx *memstore.Store, events ...interface{}) {
+func (cycle *cycle) OnBefore(topic string, ctx *memstore.Store, events ...interface{}) error {
 	ctx.Set("count", cycle.StoreCount)
 	golog.Default.Infof("OnBefore %s: %+v", topic, events)
 	cycle.BeforeFlag = true
+	return nil
+}
+
+func (cycle *cycle) OnBeforeError(topic string, ctx *memstore.Store, events ...interface{}) error {
+	ctx.Set("count", cycle.StoreCount)
+	golog.Default.Infof("OnBeforeError %s: %+v", topic, events)
+	cycle.BeforeErrorFlag = true
+	return errors.New("OnBeforeError")
 }
 
 func (cycle *cycle) OnAfter(topic string, ctx *memstore.Store, events ...interface{}) {
 	count, _ := ctx.GetInt("count")
 	cycle.StoreCount = count + 1
+	cycle.AfterCount++
 	ctx.Set("count", cycle.StoreCount)
 	golog.Default.Infof("OnAfter %s: %+v", topic, events)
 	cycle.AfterFlag = true
@@ -54,6 +66,7 @@ func (cycle *cycle) OnAfter(topic string, ctx *memstore.Store, events ...interfa
 func (cycle *cycle) OnAfterSync(topic string, ctx *memstore.Store, events ...interface{}) {
 	count, _ := ctx.GetInt("count")
 	cycle.StoreCount = count + 1
+	cycle.AfterSyncCount++
 	ctx.Set("count", cycle.StoreCount)
 	golog.Default.Infof("OnAfterSync %s: %+v", topic, events)
 	cycle.AfterSyncFlag = true
@@ -109,17 +122,6 @@ func TestSubAsync(t *testing.T) {
 	}
 }
 
-func TestSetCycle(t *testing.T) {
-	testBus.SetCycleBefore(asyncTopic, testCycle.OnBefore)
-	testBus.SetCycleAfterAll(asyncTopic, testCycle.OnAfter)
-	testBus.SetCycleAfterSync(asyncTopic, testCycle.OnAfterSync)
-	testBus.SetCycleError(asyncTopic, testCycle.OnError)
-	testBus.SetCycleBefore(syncTopic, testCycle.OnBefore)
-	testBus.SetCycleAfterAll(syncTopic, testCycle.OnAfter)
-	testBus.SetCycleAfterSync(syncTopic, testCycle.OnAfterSync)
-	testBus.SetCycleError(syncTopic, testCycle.OnError)
-}
-
 func TestPublish(t *testing.T) {
 	testBus.SetTransaction(syncTopic, true)
 	testBus.Publish(syncTopic, "publish test", "transaction")
@@ -147,6 +149,38 @@ func TestPublishSync(t *testing.T) {
 	if err != nil {
 		golog.Default.Error(err.Error())
 	}
+}
+
+func TestSetCycleError(t *testing.T) {
+	testBus.SetCycleBefore(asyncTopic, testCycle.OnBeforeError)
+	testBus.SetCycleBefore(syncTopic, testCycle.OnBeforeError)
+	TestPublish(t)
+	TestPublishSync(t)
+}
+
+func TestCycleError(t *testing.T) {
+	if !testCycle.BeforeErrorFlag {
+		t.Error("CycleBeforeErrorFlag回调失败")
+	}
+	if testCycle.AfterCount > 0 {
+		t.Errorf("CycleBeforeError逻辑出错: %d", testCycle.StoreCount)
+	}
+	if testCycle.AfterSyncCount > 0 {
+		t.Errorf("CycleBeforeError逻辑出错: %d", testCycle.StoreCount)
+	}
+}
+
+func TestSetCycle(t *testing.T) {
+	testBus.SetCycleBefore(asyncTopic, testCycle.OnBefore)
+	testBus.SetCycleAfterAll(asyncTopic, testCycle.OnAfter)
+	testBus.SetCycleAfterSync(asyncTopic, testCycle.OnAfterSync)
+	testBus.SetCycleError(asyncTopic, testCycle.OnError)
+	testBus.SetCycleBefore(syncTopic, testCycle.OnBefore)
+	testBus.SetCycleAfterAll(syncTopic, testCycle.OnAfter)
+	testBus.SetCycleAfterSync(syncTopic, testCycle.OnAfterSync)
+	testBus.SetCycleError(syncTopic, testCycle.OnError)
+	TestPublish(t)
+	TestPublishSync(t)
 }
 
 func TestCycle(t *testing.T) {

@@ -1,9 +1,9 @@
 package eventBus
 
 import (
-	"context"
 	mapSet "github.com/deckarep/golang-set"
 	"github.com/kataras/golog"
+	"github.com/kataras/iris/v12/core/memstore"
 	"sync"
 )
 
@@ -57,11 +57,11 @@ type Subscriber interface {
 // 因为会导致重复订阅,所以必须用interface的形式
 // type Callback = func(string, context.Context, ...interface{}) error
 type Callback interface {
-	Callback(topic string, ctx context.Context, events ...interface{}) error
+	Callback(topic string, ctx *memstore.Store, events ...interface{}) error
 }
 
-type CycleCallback = func(topic string, ctx context.Context, events ...interface{})
-type ErrorCallback = func(topic string, ctx context.Context, err error, events ...interface{})
+type CycleCallback = func(topic string, ctx *memstore.Store, events ...interface{})
+type ErrorCallback = func(topic string, ctx *memstore.Store, err error, events ...interface{})
 
 type eventBus struct {
 	topicMap sync.Map
@@ -79,7 +79,6 @@ type topic struct {
 	syncHandlers      []Callback
 	asyncHandlers     mapSet.Set
 	transaction       bool
-	wg                sync.WaitGroup
 	beforeCallback    CycleCallback
 	afterSyncCallback CycleCallback
 	afterCallback     CycleCallback

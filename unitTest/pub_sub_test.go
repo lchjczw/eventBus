@@ -1,12 +1,12 @@
 package unitTest
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"gitee.com/super_step/eventBus"
 	"gitee.com/super_step/go_utils/logger"
 	"github.com/kataras/golog"
+	"github.com/kataras/iris/v12/core/memstore"
 	"github.com/kataras/pio"
 	"os"
 	"testing"
@@ -20,6 +20,7 @@ const (
 var (
 	testBus   eventBus.EventBus
 	callbacks []eventBus.Callback
+	testCycle cycle
 )
 
 type callback struct {
@@ -28,7 +29,42 @@ type callback struct {
 	Recursion bool
 }
 
-func (callback *callback) Callback(topic string, ctx context.Context, events ...interface{}) error {
+type cycle struct {
+	BeforeFlag    bool
+	AfterFlag     bool
+	AfterSyncFlag bool
+	OnErrorFlag   bool
+	StoreCount    int
+}
+
+func (cycle *cycle) OnBefore(topic string, ctx *memstore.Store, events ...interface{}) {
+	ctx.Set("count", cycle.StoreCount)
+	golog.Default.Infof("OnBefore %s: %+v", topic, events)
+	cycle.BeforeFlag = true
+}
+
+func (cycle *cycle) OnAfter(topic string, ctx *memstore.Store, events ...interface{}) {
+	count, _ := ctx.GetInt("count")
+	cycle.StoreCount = count + 1
+	ctx.Set("count", cycle.StoreCount)
+	golog.Default.Infof("OnAfter %s: %+v", topic, events)
+	cycle.AfterFlag = true
+}
+
+func (cycle *cycle) OnAfterSync(topic string, ctx *memstore.Store, events ...interface{}) {
+	count, _ := ctx.GetInt("count")
+	cycle.StoreCount = count + 1
+	ctx.Set("count", cycle.StoreCount)
+	golog.Default.Infof("OnAfterSync %s: %+v", topic, events)
+	cycle.AfterSyncFlag = true
+}
+
+func (cycle *cycle) OnError(topic string, ctx *memstore.Store, err error, events ...interface{}) {
+	golog.Default.Infof("OnError %s: %+v %s", topic, events, err.Error())
+	cycle.OnErrorFlag = true
+}
+
+func (callback *callback) Callback(topic string, ctx *memstore.Store, events ...interface{}) error {
 	if len(events) == 0 {
 		golog.Default.Infof("%s# %s: %v", callback.Name, topic, "Recursioned")
 	} else {
@@ -73,6 +109,17 @@ func TestSubAsync(t *testing.T) {
 	}
 }
 
+func TestSetCycle(t *testing.T) {
+	testBus.SetCycleBefore(asyncTopic, testCycle.OnBefore)
+	testBus.SetCycleAfterAll(asyncTopic, testCycle.OnAfter)
+	testBus.SetCycleAfterSync(asyncTopic, testCycle.OnAfterSync)
+	testBus.SetCycleError(asyncTopic, testCycle.OnError)
+	testBus.SetCycleBefore(syncTopic, testCycle.OnBefore)
+	testBus.SetCycleAfterAll(syncTopic, testCycle.OnAfter)
+	testBus.SetCycleAfterSync(syncTopic, testCycle.OnAfterSync)
+	testBus.SetCycleError(syncTopic, testCycle.OnError)
+}
+
 func TestPublish(t *testing.T) {
 	testBus.SetTransaction(syncTopic, true)
 	testBus.Publish(syncTopic, "publish test", "transaction")
@@ -99,6 +146,25 @@ func TestPublishSync(t *testing.T) {
 	err = testBus.PublishSyncNoWait(asyncTopic, "PublishSync")
 	if err != nil {
 		golog.Default.Error(err.Error())
+	}
+}
+
+func TestCycle(t *testing.T) {
+	testBus.WaitAsync()
+	if !testCycle.BeforeFlag {
+		t.Error("CycleBefore回调失败")
+	}
+	if !testCycle.AfterFlag {
+		t.Error("CycleAfter回调失败")
+	}
+	if !testCycle.AfterSyncFlag {
+		t.Error("CycleAfterSync回调失败")
+	}
+	if !testCycle.OnErrorFlag {
+		t.Error("CycleOnError回调失败")
+	}
+	if testCycle.StoreCount == 0 {
+		t.Errorf("Store测试失败: %d", testCycle.StoreCount)
 	}
 }
 
@@ -169,6 +235,7 @@ func TestMain(m *testing.M) {
 	golog.Default.SetTimeFormat("2006-01-02 15:04:05")
 	golog.Default.SetLevel("debug")
 	testBus = eventBus.NewBus(golog.Default)
+	testCycle = cycle{}
 	for i := 0; i < 4; i++ {
 		callbackStruck := newCallback(fmt.Sprintf("%d", i), i == 2)
 		callbacks = append(callbacks, callbackStruck)

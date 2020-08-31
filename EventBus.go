@@ -15,9 +15,14 @@ type EventBus interface {
 }
 
 type Cycle interface {
+	// 设置发布时回调
 	SetCycleBefore(topic string, callback CycleCallback)
+	// 设置同步完成时回调
 	SetCycleAfterSync(topic string, callback CycleCallback)
+	// 设置全部完成时回调
 	SetCycleAfterAll(topic string, callback CycleCallback)
+	// 设置错误时回调
+	SetCycleError(topic string, onError ErrorCallback)
 }
 
 type Controller interface {
@@ -38,10 +43,6 @@ type Publisher interface {
 	PublishSyncNoWait(topic string, events ...interface{}) error
 }
 
-type Callback interface {
-	Callback(topic string, ctx context.Context, events ...interface{}) error
-}
-
 type Subscriber interface {
 	// 同步订阅主题
 	Subscribe(topic string, callback Callback) error
@@ -55,8 +56,12 @@ type Subscriber interface {
 
 // 因为会导致重复订阅,所以必须用interface的形式
 // type Callback = func(string, context.Context, ...interface{}) error
+type Callback interface {
+	Callback(topic string, ctx context.Context, events ...interface{}) error
+}
 
-type CycleCallback = func(ctx context.Context)
+type CycleCallback = func(topic string, ctx context.Context, events ...interface{})
+type ErrorCallback = func(topic string, ctx context.Context, err error, events ...interface{})
 
 type eventBus struct {
 	topicMap sync.Map
@@ -78,6 +83,7 @@ type topic struct {
 	beforeCallback    CycleCallback
 	afterSyncCallback CycleCallback
 	afterCallback     CycleCallback
+	onErrorCallback   ErrorCallback
 	sync.RWMutex
 }
 

@@ -40,12 +40,12 @@ func (bus *eventBus) publishSync(topic string, wait bool, events ...interface{})
 	publishContext := context.Background()
 	Topic := bus.getTopic(topic)
 	if Topic.beforeCallback != nil {
-		Topic.beforeCallback(publishContext)
+		Topic.beforeCallback(topic, publishContext)
 	}
 	bus.callAsync(topic, publishContext, events, Topic)
 	err := bus.callSync(topic, publishContext, events, Topic)
 	if Topic.afterSyncCallback != nil {
-		Topic.afterSyncCallback(publishContext)
+		Topic.afterSyncCallback(topic, publishContext, events...)
 	}
 	if err != nil {
 		return err
@@ -54,7 +54,7 @@ func (bus *eventBus) publishSync(topic string, wait bool, events ...interface{})
 		Topic.wg.Wait()
 	}
 	if Topic.afterCallback != nil {
-		Topic.afterCallback(publishContext)
+		Topic.afterCallback(topic, publishContext, events...)
 	}
 	return err
 }
@@ -69,10 +69,12 @@ func (bus *eventBus) callSync(topic string, ctx context.Context, events []interf
 	Topic.RUnlock()
 	var tmpErr error
 	for _, syncHandler := range syncHandlers {
-		// fmt.Println(syncHandler)
 		err := syncHandler.Callback(topic, ctx, events...)
 		if err != nil {
 			bus.logger.Errorf("eventBus(sync): %s%v#%s", topic, events, err.Error())
+			if Topic.onErrorCallback != nil {
+				Topic.onErrorCallback(topic, ctx, err, events...)
+			}
 			if Topic.transaction {
 				return err
 			} else {
@@ -102,8 +104,11 @@ func (bus *eventBus) callAsync(topic string, ctx context.Context, events []inter
 				result := callbackFunc.Call(params)
 				if len(result) > 0 && !result[0].IsNil() {
 					err, ok := result[0].Interface().(error)
-					if ok {
+					if ok && err != nil {
 						bus.logger.Errorf("eventBus(async): %s%v#%s", topic, events, err.Error())
+						if Topic.onErrorCallback != nil {
+							Topic.onErrorCallback(topic, ctx, err, events...)
+						}
 					}
 				}
 				Topic.wg.Done()

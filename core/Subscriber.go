@@ -1,4 +1,4 @@
-package eventBus
+package core
 
 import (
 	"errors"

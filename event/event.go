@@ -3,12 +3,12 @@ package event
 import (
 	"errors"
 	"github.com/kataras/golog"
-	"github.com/lchjczw/eventBus"
+	"github.com/lchjczw/eventBus/core"
 	"strings"
 	"sync"
 )
 
-var globalBus = eventBus.NewBus(golog.Default)
+var globalBus = core.NewBus(golog.Default)
 var root = NewRootEvent(globalBus)
 
 func Root() Event {
@@ -17,9 +17,9 @@ func Root() Event {
 
 type event struct {
 	Topic    string
-	Desc     string
-	bus     eventBus.EventBus
-	handler eventBus.Handler
+	Desc    string
+	bus     core.EventBus
+	handler core.Handler
 
 	prent    *event
 	children []*event
@@ -91,14 +91,14 @@ func (a *event) PublishSyncNoWait(args ...interface{}) error {
 
 // SubscribeSync 注册
 // 给handler同时实现hook接口，则直接注入hook
-func (a *event) SubscribeSync(handler eventBus.Handler) error {
+func (a *event) SubscribeSync(handler core.Handler) error {
 	a.handler = handler
 	err := a.bus.SubscribeSync(a.CompleteTopic(), handler)
 	if err != nil {
 		return err
 	}
 
-	hook, ok := handler.(eventBus.Hook)
+	hook, ok := handler.(core.Hook)
 	if ok {
 		a.bus.SetHook(a.CompleteTopic(), hook)
 	}
@@ -106,7 +106,7 @@ func (a *event) SubscribeSync(handler eventBus.Handler) error {
 	return nil
 }
 
-func (a *event) SubscribeAsync(handler eventBus.Handler) error {
+func (a *event) SubscribeAsync(handler core.Handler) error {
 	a.handler = handler
 	return a.bus.SubscribeAsync(a.CompleteTopic(), handler)
 }
@@ -114,14 +114,14 @@ func (a *event) SubscribeAsync(handler eventBus.Handler) error {
 type Event interface {
 	Event(path, desc string) *event
 	CompleteTopic() string // 完整topic
-	SubscribeSync(handler eventBus.Handler) error
-	SubscribeAsync(handler eventBus.Handler) error
+	SubscribeSync(handler core.Handler) error
+	SubscribeAsync(handler core.Handler) error
 	PublishAsync(args ...interface{})
 	PublishSync(args ...interface{}) error
 	PublishSyncNoWait(args ...interface{}) error
 }
 
-func NewRootEvent(bus eventBus.EventBus) Event {
+func NewRootEvent(bus core.EventBus) Event {
 	if bus == nil {
 		bus = globalBus
 	}

@@ -1,9 +1,9 @@
 package eventBus
 
 import (
+	"gitee.com/super_step/eventBus/pkg/memstore"
 	mapSet "github.com/deckarep/golang-set"
 	"github.com/kataras/golog"
-	"github.com/kataras/iris/v12/core/memstore"
 	"sync"
 )
 

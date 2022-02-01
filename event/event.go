@@ -11,22 +11,22 @@ import (
 var globalBus = eventBus.NewBus(golog.Default)
 var root = NewRootEvent(globalBus)
 
-func Root() *Event {
+func Root() Event {
 	return root
 }
 
-type Event struct {
+type event struct {
 	Topic    string
 	Desc     string
 	bus      eventBus.EventBus
 	callBack eventBus.Callback
 
-	prent    *Event
-	children []*Event
+	prent    *event
+	children []*event
 	sync.RWMutex
 }
 
-func (a *Event) Check(topic string) error {
+func (a *event) Check(topic string) error {
 	if strings.ContainsAny(topic, "\\/") {
 		return errors.New("topic不能包含\\/字符")
 	}
@@ -38,7 +38,7 @@ func (a *Event) Check(topic string) error {
 	return nil
 }
 
-func (a *Event) IsExist(topic string) bool {
+func (a *event) IsExist(topic string) bool {
 	for i := range a.children {
 		if topic == a.children[i].Topic {
 			return true
@@ -47,7 +47,7 @@ func (a *Event) IsExist(topic string) bool {
 	return false
 }
 
-func (a *Event) Key() string {
+func (a *event) Key() string {
 	// 遍历到root,得到前缀
 	var key string
 	t := a
@@ -63,12 +63,12 @@ func (a *Event) Key() string {
 	}
 	return key
 }
-func (a *Event) Event(topic, desc string) *Event {
+func (a *event) Event(topic, desc string) *event {
 	if err := a.Check(topic); err != nil {
 		panic(err)
 	}
 
-	t := &Event{
+	t := &event{
 		Topic:    topic,
 		Desc:     desc,
 		prent:    a,
@@ -80,19 +80,19 @@ func (a *Event) Event(topic, desc string) *Event {
 	a.Unlock()
 	return t
 }
-func (a *Event) PublishAsync(args ...interface{}) {
+func (a *event) PublishAsync(args ...interface{}) {
 	a.bus.PublishAsync(a.Key(), args...)
 }
-func (a *Event) PublishSync(args ...interface{}) error {
+func (a *event) PublishSync(args ...interface{}) error {
 	return a.bus.PublishSync(a.Key(), args...)
 }
-func (a *Event) PublishSyncNoWait(args ...interface{}) error {
+func (a *event) PublishSyncNoWait(args ...interface{}) error {
 	return a.bus.PublishSyncNoWait(a.Key(), args...)
 }
 
 // SubscribeSync 注册
 // 给callback同时实现hook接口，则直接注入hook
-func (a *Event) SubscribeSync(callback eventBus.Callback) error {
+func (a *event) SubscribeSync(callback eventBus.Callback) error {
 	a.callBack = callback
 	err := a.bus.SubscribeSync(a.Key(), callback)
 	if err != nil {
@@ -107,13 +107,13 @@ func (a *Event) SubscribeSync(callback eventBus.Callback) error {
 	return nil
 }
 
-func (a *Event) SubscribeAsync(callback eventBus.Callback) error {
+func (a *event) SubscribeAsync(callback eventBus.Callback) error {
 	a.callBack = callback
 	return a.bus.SubscribeAsync(a.Key(), callback)
 }
 
-type EventInter interface {
-	Event(path, desc string) *Event
+type Event interface {
+	Event(path, desc string) *event
 	Key() string
 	SubscribeSync(callback eventBus.Callback) error
 	SubscribeAsync(callback eventBus.Callback) error
@@ -122,12 +122,12 @@ type EventInter interface {
 	PublishSyncNoWait(args ...interface{}) error
 }
 
-func NewRootEvent(bus eventBus.EventBus) *Event {
+func NewRootEvent(bus eventBus.EventBus) Event {
 	if bus == nil {
 		bus = globalBus
 	}
 
-	e := &Event{
+	e := &event{
 		Topic: "/",
 		Desc:  "root节点",
 		bus:   bus,

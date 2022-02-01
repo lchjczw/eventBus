@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"gitee.com/super_step/eventBus"
 	"github.com/kataras/golog"
-	"github.com/kataras/iris/v12/core/memstore"
+	"gitee.com/super_step/eventBus/pkg/memstore"
 	"testing"
 )
 

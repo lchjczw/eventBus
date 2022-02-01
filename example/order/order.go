@@ -2,8 +2,8 @@ package order
 
 import (
 	"fmt"
-	"gitee.com/super_step/eventBus/event/example/manage"
-	"github.com/kataras/iris/v12/core/memstore"
+	"gitee.com/super_step/eventBus/example/manage"
+	"gitee.com/super_step/eventBus/pkg/memstore"
 )
 
 type OrderEvent struct{}
@@ -29,7 +29,7 @@ func (e *OrderEvent) Callback(topic string, ctx *memstore.Store, events ...inter
 }
 
 func Order() {
-	err:=manage.Sale.PublishSyncNoWait(1, "order -> sale")
+	err:= manage.Sale.PublishSyncNoWait(1, "order -> sale")
 	if err != nil {
 		fmt.Println(err.Error())
 	}

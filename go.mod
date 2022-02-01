@@ -5,7 +5,6 @@ go 1.17
 require (
 	github.com/deckarep/golang-set v1.7.1
 	github.com/kataras/golog v0.0.18
-	github.com/kataras/iris/v12 v12.1.8
 )
 
 require (

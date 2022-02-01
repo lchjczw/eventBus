@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"gitee.com/super_step/eventBus"
 	"github.com/kataras/golog"
-	"path"
 	"strings"
 )
 
@@ -17,7 +16,6 @@ func Root() *Event {
 }
 
 func init() {
-
 	logger := golog.New()
 	globalBus = eventBus.NewBus(logger)
 	root = &Event{
@@ -74,7 +72,7 @@ func (a *Event) Key() string {
 		t = t.prent
 
 	}
-	return path.Clean(key)
+	return "/" + key
 }
 func (a *Event) Event(topic, desc string) *Event {
 	if err := a.Check(topic); err != nil {
@@ -101,6 +99,7 @@ func (a *Event) PublishSync(args ...interface{}) error {
 func (a *Event) PublishSyncNoWait(args ...interface{}) error {
 	return a.bus.PublishSyncNoWait(a.Key(), args...)
 }
+
 // Register 注册
 func (a *Event) Register(callback eventBus.Callback) error {
 	a.callBack = callback

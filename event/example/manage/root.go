@@ -4,11 +4,6 @@ import (
 	"gitee.com/super_step/eventBus/event"
 )
 
-const (
-	SaleEvent  = "status"
-	OrderEvent = "Order"
-)
-
 var (
 	r1 = event.Root()
 

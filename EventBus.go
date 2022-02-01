@@ -25,8 +25,8 @@ type Controller interface {
 }
 
 type Publisher interface {
-	// 发布
-	Publish(topic string, events ...interface{})
+	// 异步发布
+	PublishAsync(topic string, events ...interface{})
 	// 同步发布
 	PublishSync(topic string, events ...interface{}) error
 	// 同步发布, 不等待异步调用完成
@@ -35,9 +35,9 @@ type Publisher interface {
 
 type Subscriber interface {
 	// 同步订阅主题
-	Register(topic string, callback Callback) error
+	SubscribeSync(topic string, callback Callback) error
 	// 异步订阅主题
-	RegisterAsync(topic string, callback Callback) error
+	SubscribeAsync(topic string, callback Callback) error
 	// 取消已订阅的主题
 	UnSubscribe(topic string, callback Callback)
 	// 取消所有已订阅的主题
@@ -51,9 +51,13 @@ type Callback interface {
 }
 
 type Hook interface {
+	// 发布前回调
 	Before(topic string, ctx *memstore.Store, events ...interface{}) error
+	// 同步完成时回调
 	AfterSync(topic string, ctx *memstore.Store, events ...interface{})
+	// 全部完成时回调
 	After(topic string, ctx *memstore.Store, events ...interface{})
+	// 错误时回调
 	Error(topic string, ctx *memstore.Store, err error, events ...interface{})
 }
 

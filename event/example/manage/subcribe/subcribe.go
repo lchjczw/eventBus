@@ -7,6 +7,6 @@ import (
 )
 
 func init() {
-	manage.Sale.Register(&sale.SaleEvent{})
-	manage.Order.Register(&order.OrderEvent{})
+	manage.Sale.SubscribeSync(&sale.SaleEvent{})
+	manage.Order.SubscribeSync(&order.OrderEvent{})
 }

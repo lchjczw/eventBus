@@ -75,7 +75,7 @@ func (callback *callback) Callback(topic string, ctx *memstore.Store, events ...
 	} else {
 		golog.Default.Infof("%s# %s: %v", callback.Name, topic, events)
 		if callback.Recursion {
-			testBus.Publish(topic)
+			testBus.PublishAsync(topic)
 		}
 	}
 	if callback.Err {
@@ -86,12 +86,12 @@ func (callback *callback) Callback(topic string, ctx *memstore.Store, events ...
 
 func TestSub(t *testing.T) {
 	for index, callback := range callbacks {
-		err := testBus.Register(syncTopic, callback)
+		err := testBus.SubscribeSync(syncTopic, callback)
 		if err != nil {
 			t.Error(index, err.Error())
 			return
 		}
-		err = testBus.Register(syncTopic, callback)
+		err = testBus.SubscribeSync(syncTopic, callback)
 		if err == nil {
 			t.Error("重复订阅未报告异常")
 			return
@@ -101,12 +101,12 @@ func TestSub(t *testing.T) {
 
 func TestSubAsync(t *testing.T) {
 	for index, callback := range callbacks {
-		err := testBus.RegisterAsync(asyncTopic, callback)
+		err := testBus.SubscribeAsync(asyncTopic, callback)
 		if err != nil {
 			t.Error(index, err.Error())
 			return
 		}
-		err = testBus.RegisterAsync(asyncTopic, callback)
+		err = testBus.SubscribeAsync(asyncTopic, callback)
 		if err == nil {
 			t.Error("重复订阅未报告异常")
 			return
@@ -116,11 +116,11 @@ func TestSubAsync(t *testing.T) {
 
 func TestPublish(t *testing.T) {
 	testBus.SetTransaction(syncTopic, true)
-	testBus.Publish(syncTopic, "publish test", "transaction")
+	testBus.PublishAsync(syncTopic, "publish test", "transaction")
 	testBus.WaitAsync()
 	testBus.SetTransaction(syncTopic, false)
-	testBus.Publish(syncTopic, "publish test")
-	testBus.Publish(asyncTopic, "publish test")
+	testBus.PublishAsync(syncTopic, "publish test")
+	testBus.PublishAsync(asyncTopic, "publish test")
 	testBus.WaitAsync()
 }
 
@@ -188,7 +188,7 @@ func TestCycle(t *testing.T) {
 
 func TestUnSubAsync(t *testing.T) {
 	for index, callback := range callbacks {
-		testBus.Publish(syncTopic, "Sync", "UnSub", index)
+		testBus.PublishAsync(syncTopic, "Sync", "UnSub", index)
 		testBus.WaitAsync()
 		testBus.UnSubscribe(syncTopic, callback)
 	}
@@ -196,7 +196,7 @@ func TestUnSubAsync(t *testing.T) {
 
 func TestUnSubSync(t *testing.T) {
 	for index, callback := range callbacks {
-		testBus.Publish(asyncTopic, "Async", "UnSub", index)
+		testBus.PublishAsync(asyncTopic, "Async", "UnSub", index)
 		testBus.WaitAsync()
 		testBus.UnSubscribe(asyncTopic, callback)
 	}
@@ -207,15 +207,15 @@ func TestUnSubAll(t *testing.T) {
 	TestSubAsync(t)
 	length := len(callbacks)
 	for i := 1; i <= length; i++ {
-		testBus.Publish(asyncTopic, "Async", "UnSubAll", i)
-		testBus.Publish(syncTopic, "Sync", "UnSubAll", i)
+		testBus.PublishAsync(asyncTopic, "Async", "UnSubAll", i)
+		testBus.PublishAsync(syncTopic, "Sync", "UnSubAll", i)
 		testBus.WaitAsync()
 		testBus.UnSubscribeAll(callbacks[length-i])
 	}
 
 	for index, callback := range callbacks {
-		testBus.Publish(asyncTopic, "Async", "UnSubAll", index)
-		testBus.Publish(syncTopic, "Sync", "UnSubAll", index)
+		testBus.PublishAsync(asyncTopic, "Async", "UnSubAll", index)
+		testBus.PublishAsync(syncTopic, "Sync", "UnSubAll", index)
 		testBus.WaitAsync()
 		testBus.UnSubscribeAll(callback)
 	}
@@ -227,12 +227,12 @@ func TestRecursionSub(t *testing.T) {
 		Err:       false,
 		Recursion: true,
 	}
-	err := testBus.Register(syncTopic, &callbackRecursion)
+	err := testBus.SubscribeSync(syncTopic, &callbackRecursion)
 	if err != nil {
 		t.Error("Recursion", err.Error())
 		return
 	}
-	testBus.Publish(syncTopic, "Recursion")
+	testBus.PublishAsync(syncTopic, "Recursion")
 	testBus.WaitAsync()
 	testBus.UnSubscribe(syncTopic, &callbackRecursion)
 }
@@ -240,10 +240,10 @@ func TestRecursionSub(t *testing.T) {
 func TestCloseTopic(t *testing.T) {
 	TestSub(t)
 	TestSubAsync(t)
-	testBus.Publish(syncTopic, "BeforeClose")
+	testBus.PublishAsync(syncTopic, "BeforeClose")
 	testBus.WaitAsync()
 	testBus.CloseTopic(syncTopic)
-	testBus.Publish(syncTopic, "Closed")
+	testBus.PublishAsync(syncTopic, "Closed")
 	testBus.WaitAsync()
 }
 

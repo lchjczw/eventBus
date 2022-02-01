@@ -5,8 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6ae86e73-e9cd-41c6-bb9c-ff64a94871d5" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EventBus.go" beforeDir="false" afterPath="$PROJECT_DIR$/EventBus.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Publisher.go" beforeDir="false" afterPath="$PROJECT_DIR$/Publisher.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Subscriber.go" beforeDir="false" afterPath="$PROJECT_DIR$/Subscriber.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/event/event.go" beforeDir="false" afterPath="$PROJECT_DIR$/event/event.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/event/example/manage/subcribe/subcribe.go" beforeDir="false" afterPath="$PROJECT_DIR$/event/example/manage/subcribe/subcribe.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/unitTest/pub_sub_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/unitTest/pub_sub_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

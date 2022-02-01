@@ -79,8 +79,8 @@ func (a *Event) Event(topic, desc string) *Event {
 	a.children = append(a.children, t)
 	return t
 }
-func (a *Event) Publish(args ...interface{}) {
-	a.bus.Publish(a.Key(), args...)
+func (a *Event) PublishAsync(args ...interface{}) {
+	a.bus.PublishAsync(a.Key(), args...)
 }
 func (a *Event) PublishSync(args ...interface{}) error {
 	return a.bus.PublishSync(a.Key(), args...)
@@ -89,11 +89,11 @@ func (a *Event) PublishSyncNoWait(args ...interface{}) error {
 	return a.bus.PublishSyncNoWait(a.Key(), args...)
 }
 
-// Register 注册
+// SubscribeSync 注册
 // 给callback同时实现hook接口，则直接注入hook
-func (a *Event) Register(callback eventBus.Callback) error {
+func (a *Event) SubscribeSync(callback eventBus.Callback) error {
 	a.callBack = callback
-	err := a.bus.Register(a.Key(), callback)
+	err := a.bus.SubscribeSync(a.Key(), callback)
 	if err != nil {
 		return err
 	}
@@ -106,17 +106,17 @@ func (a *Event) Register(callback eventBus.Callback) error {
 	return nil
 }
 
-func (a *Event) RegisterAsync(callback eventBus.Callback) error {
+func (a *Event) SubscribeAsync(callback eventBus.Callback) error {
 	a.callBack = callback
-	return a.bus.RegisterAsync(a.Key(), callback)
+	return a.bus.SubscribeAsync(a.Key(), callback)
 }
 
 type EventInter interface {
 	Event(path, desc string) *Event
 	Key() string
-	Register(callback eventBus.Callback) error
-	RegisterAsync(callback eventBus.Callback) error
-	Publish(args ...interface{})
+	SubscribeSync(callback eventBus.Callback) error
+	SubscribeAsync(callback eventBus.Callback) error
+	PublishAsync(args ...interface{})
 	PublishSync(args ...interface{}) error
 	PublishSyncNoWait(args ...interface{}) error
 }

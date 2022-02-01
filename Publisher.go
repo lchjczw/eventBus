@@ -8,7 +8,7 @@ import (
 )
 
 // 异步发布
-func (bus *eventBus) Publish(topic string, events ...interface{}) {
+func (bus *eventBus) PublishAsync(topic string, events ...interface{}) {
 	bus.wg.Add(1)
 	bus.logger.Debugf("asyncPublish topic:%s events:%v", topic, events)
 	go bus.publish(topic, events...)

@@ -5,6 +5,7 @@ import (
 	"gitee.com/super_step/eventBus"
 	"github.com/kataras/golog"
 	"strings"
+	"sync"
 )
 
 var globalBus = eventBus.NewBus(golog.Default)
@@ -17,11 +18,12 @@ func Root() *Event {
 type Event struct {
 	Topic    string
 	Desc     string
+	bus      eventBus.EventBus
 	callBack eventBus.Callback
 
 	prent    *Event
 	children []*Event
-	bus      eventBus.EventBus
+	sync.RWMutex
 }
 
 func (a *Event) Check(topic string) error {
@@ -57,9 +59,7 @@ func (a *Event) Key() string {
 		if t.prent == nil {
 			break
 		}
-
 		t = t.prent
-
 	}
 	return key
 }
@@ -75,8 +75,9 @@ func (a *Event) Event(topic, desc string) *Event {
 		children: nil,
 		bus:      a.bus,
 	}
-
+	a.Lock()
 	a.children = append(a.children, t)
+	a.Unlock()
 	return t
 }
 func (a *Event) PublishAsync(args ...interface{}) {
@@ -127,9 +128,9 @@ func NewRootEvent(bus eventBus.EventBus) *Event {
 	}
 
 	e := &Event{
-		Topic:    "/",
-		Desc:     "root节点",
-		bus:      bus,
+		Topic: "/",
+		Desc:  "root节点",
+		bus:   bus,
 	}
 	return e
 }

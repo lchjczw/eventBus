@@ -4,19 +4,7 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6ae86e73-e9cd-41c6-bb9c-ff64a94871d5" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EventBus.go" beforeDir="false" afterPath="$PROJECT_DIR$/EventBus.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Publisher.go" beforeDir="false" afterPath="$PROJECT_DIR$/Publisher.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/event/event.go" beforeDir="false" afterPath="$PROJECT_DIR$/event/event.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/manage/root.go" beforeDir="false" afterPath="$PROJECT_DIR$/example/manage/root.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/manage/subcribe/subcribe.go" beforeDir="false" afterPath="$PROJECT_DIR$/example/manage/subcribe/subcribe.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/manage/subcribe/subcribe_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/example/manage/subcribe/subcribe_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/order/order.go" beforeDir="false" afterPath="$PROJECT_DIR$/example/order/order.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/sale/sale.go" beforeDir="false" afterPath="$PROJECT_DIR$/example/sale/sale.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/unitTest/pub_sub_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/unitTest/pub_sub_test.go" afterDir="false" />
-    </list>
+    <list default="true" id="6ae86e73-e9cd-41c6-bb9c-ff64a94871d5" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -178,7 +166,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="master" />
+                        <option value="dev" />
                       </list>
                     </value>
                   </entry>

@@ -2,8 +2,8 @@ package event
 
 import (
 	"errors"
-	"github.com/lchjczw/eventBus"
 	"github.com/kataras/golog"
+	"github.com/lchjczw/eventBus"
 	"strings"
 	"sync"
 )
@@ -47,7 +47,7 @@ func (a *event) IsExist(topic string) bool {
 	return false
 }
 
-func (a *event) Key() string {
+func (a *event) CompleteTopic() string {
 	// 遍历到root,得到前缀
 	var key string
 	t := a
@@ -72,7 +72,6 @@ func (a *event) Event(topic, desc string) *event {
 		Topic:    topic,
 		Desc:     desc,
 		prent:    a,
-		children: nil,
 		bus:      a.bus,
 	}
 	a.Lock()
@@ -81,27 +80,27 @@ func (a *event) Event(topic, desc string) *event {
 	return t
 }
 func (a *event) PublishAsync(args ...interface{}) {
-	a.bus.PublishAsync(a.Key(), args...)
+	a.bus.PublishAsync(a.CompleteTopic(), args...)
 }
 func (a *event) PublishSync(args ...interface{}) error {
-	return a.bus.PublishSync(a.Key(), args...)
+	return a.bus.PublishSync(a.CompleteTopic(), args...)
 }
 func (a *event) PublishSyncNoWait(args ...interface{}) error {
-	return a.bus.PublishSyncNoWait(a.Key(), args...)
+	return a.bus.PublishSyncNoWait(a.CompleteTopic(), args...)
 }
 
 // SubscribeSync 注册
 // 给handler同时实现hook接口，则直接注入hook
 func (a *event) SubscribeSync(handler eventBus.Handler) error {
 	a.handler = handler
-	err := a.bus.SubscribeSync(a.Key(), handler)
+	err := a.bus.SubscribeSync(a.CompleteTopic(), handler)
 	if err != nil {
 		return err
 	}
 
 	hook, ok := handler.(eventBus.Hook)
 	if ok {
-		a.bus.SetHook(a.Key(), hook)
+		a.bus.SetHook(a.CompleteTopic(), hook)
 	}
 
 	return nil
@@ -109,12 +108,12 @@ func (a *event) SubscribeSync(handler eventBus.Handler) error {
 
 func (a *event) SubscribeAsync(handler eventBus.Handler) error {
 	a.handler = handler
-	return a.bus.SubscribeAsync(a.Key(), handler)
+	return a.bus.SubscribeAsync(a.CompleteTopic(), handler)
 }
 
 type Event interface {
 	Event(path, desc string) *event
-	Key() string
+	CompleteTopic() string // 完整topic
 	SubscribeSync(handler eventBus.Handler) error
 	SubscribeAsync(handler eventBus.Handler) error
 	PublishAsync(args ...interface{})

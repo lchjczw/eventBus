@@ -4,11 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"gitee.com/super_step/eventBus"
-	"gitee.com/super_step/go_utils/logger"
 	"github.com/kataras/golog"
 	"github.com/kataras/iris/v12/core/memstore"
-	"github.com/kataras/pio"
-	"os"
 	"testing"
 )
 
@@ -248,8 +245,8 @@ func TestCloseTopic(t *testing.T) {
 }
 
 func TestMain(m *testing.M) {
-	golog.Default.Printer = pio.NewPrinter("", os.Stdout).
-		EnableDirectOutput().Hijack(logger.Hijacker).SetSync(false)
+	//golog.Default.Printer = pio.NewPrinter("", os.Stdout).
+	//	EnableDirectOutput().Hijack(logger.Hijacker).SetSync(false)
 	golog.Default.SetTimeFormat("2006-01-02 15:04:05")
 	golog.Default.SetLevel("debug")
 	testBus = eventBus.NewBus(golog.Default)

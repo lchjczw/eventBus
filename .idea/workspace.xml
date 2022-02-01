@@ -5,8 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6ae86e73-e9cd-41c6-bb9c-ff64a94871d5" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/pkg/myError/error.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/event/event.go" beforeDir="false" afterPath="$PROJECT_DIR$/event/event.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Publisher.go" beforeDir="false" afterPath="$PROJECT_DIR$/Publisher.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/unitTest/pub_sub_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/unitTest/pub_sub_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,7 +44,9 @@
     <option name="indexEntireGoPath" value="false" />
   </component>
   <component name="ProjectId" id="24Su0x2h2DNRKHirOITMnoqDuFP" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="autoscrollFromSource" value="true" />
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -58,15 +63,16 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.modules.go.list.on.any.changes.was.set" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/pkg" />
     <property name="settings.editor.selected.configurable" value="com.goide.configuration.GoProjectSettingsConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/pkg" />
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestEvent in gitee.com/super_step/eventBus/event/example/manage/subcribe">
+  <component name="RunManager" selected="Go Test.TestSub in gitee.com/super_step/eventBus/unitTest">
     <configuration name="TestCycleError in gitee.com/super_step/eventBus/unitTest" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="eventBus" />
       <working_directory value="$PROJECT_DIR$/unitTest" />
@@ -77,18 +83,6 @@
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
       <pattern value="^\QTestCycleError\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestEvent in gitee.com/super_step/eventBus/event/example/init" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="eventBus" />
-      <working_directory value="$PROJECT_DIR$/event/example/init" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="gitee.com/super_step/eventBus/event/example/init" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestEvent\E$" />
       <method v="2" />
     </configuration>
     <configuration name="TestEvent in gitee.com/super_step/eventBus/event/example/manage/init" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -127,13 +121,25 @@
       <pattern value="^\QTestSetCycleError\E$" />
       <method v="2" />
     </configuration>
+    <configuration name="TestSub in gitee.com/super_step/eventBus/unitTest" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="eventBus" />
+      <working_directory value="$PROJECT_DIR$/unitTest" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="gitee.com/super_step/eventBus/unitTest" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestSub\E$" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestSub in gitee.com/super_step/eventBus/unitTest" />
         <item itemvalue="Go Test.TestEvent in gitee.com/super_step/eventBus/event/example/manage/subcribe" />
         <item itemvalue="Go Test.TestCycleError in gitee.com/super_step/eventBus/unitTest" />
         <item itemvalue="Go Test.TestSetCycleError in gitee.com/super_step/eventBus/unitTest" />
         <item itemvalue="Go Test.TestEvent in gitee.com/super_step/eventBus/event/example/manage/init" />
-        <item itemvalue="Go Test.TestEvent in gitee.com/super_step/eventBus/event/example/init" />
       </list>
     </recent_temporary>
   </component>
@@ -192,7 +198,7 @@
         </line-breakpoint>
         <line-breakpoint type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/unitTest/pub_sub_test.go</url>
-          <line>118</line>
+          <line>115</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint type="DlvLineBreakpoint">
@@ -217,12 +223,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/unitTest/pub_sub_test.go</url>
-          <line>94</line>
+          <line>91</line>
           <option name="timeStamp" value="15" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/unitTest/pub_sub_test.go</url>
-          <line>102</line>
+          <line>99</line>
           <option name="timeStamp" value="16" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">

@@ -1,7 +1,7 @@
 package eventBus
 
 import (
-	"gitee.com/super_step/go_utils/myError"
+	"gitee.com/super_step/eventBus/pkg/myError"
 	"github.com/kataras/iris/v12/core/memstore"
 	"reflect"
 	"sync"

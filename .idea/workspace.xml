@@ -6,16 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="6ae86e73-e9cd-41c6-bb9c-ff64a94871d5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/Controller.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cycle.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/EventBus.go" beforeDir="false" afterPath="$PROJECT_DIR$/EventBus.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Publisher.go" beforeDir="false" afterPath="$PROJECT_DIR$/Publisher.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/event/cycle.go" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/event/event.go" beforeDir="false" afterPath="$PROJECT_DIR$/event/event.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/event/example/manage/subcribe/subcribe.go" beforeDir="false" afterPath="$PROJECT_DIR$/event/example/manage/subcribe/subcribe.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/event/example/order/order.go" beforeDir="false" afterPath="$PROJECT_DIR$/event/example/order/order.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/event/example/sale/sale.go" beforeDir="false" afterPath="$PROJECT_DIR$/event/example/sale/sale.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/unitTest/pub_sub_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/unitTest/pub_sub_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -191,7 +182,7 @@
       <breakpoints>
         <line-breakpoint type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/event/event.go</url>
-          <line>105</line>
+          <line>95</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint type="DlvLineBreakpoint">
@@ -221,7 +212,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/event/event.go</url>
-          <line>93</line>
+          <line>82</line>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">

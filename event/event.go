@@ -2,27 +2,16 @@ package event
 
 import (
 	"errors"
-	"fmt"
 	"gitee.com/super_step/eventBus"
 	"github.com/kataras/golog"
 	"strings"
 )
 
-var globalBus eventBus.EventBus
-var root *Event
+var globalBus = eventBus.NewBus(golog.Default)
+var root = NewRootEvent(globalBus)
 
 func Root() *Event {
 	return root
-}
-
-func init() {
-	logger := golog.New()
-	globalBus = eventBus.NewBus(logger)
-	root = &Event{
-		Topic: "/",
-		Desc:  "root节点",
-		bus:   globalBus,
-	}
 }
 
 type Event struct {
@@ -101,13 +90,13 @@ func (a *Event) PublishSyncNoWait(args ...interface{}) error {
 }
 
 // Register 注册
+// 给callback同时实现hook接口，则直接注入hook
 func (a *Event) Register(callback eventBus.Callback) error {
 	a.callBack = callback
 	err := a.bus.Register(a.Key(), callback)
 	if err != nil {
 		return err
 	}
-	//hook eventBus.Hook
 
 	hook, ok := callback.(eventBus.Hook)
 	if ok {
@@ -132,23 +121,14 @@ type EventInter interface {
 	PublishSyncNoWait(args ...interface{}) error
 }
 
-func Init() {
-	sys := root.Event(`system`, `系统级事件`)
-	fmt.Println(sys)
-	sale := root.Event(`sale`, `销售相关事件`)
-	fmt.Println(sale)
-}
-
-func NewRootEvent(bus eventBus.EventBus, topic, desc string) *Event {
+func NewRootEvent(bus eventBus.EventBus) *Event {
 	if bus == nil {
 		bus = globalBus
 	}
 
 	e := &Event{
-		Topic:    topic,
-		Desc:     desc,
-		callBack: nil,
-		children: nil,
+		Topic:    "/",
+		Desc:     "root节点",
 		bus:      bus,
 	}
 	return e

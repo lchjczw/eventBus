@@ -11,6 +11,14 @@ func (bus *eventBus) SetTransaction(topicName string, tr bool) {
 	Topic.transaction = tr
 	bus.topicMap.Store(topicName, Topic)
 }
+func (bus *eventBus) SetHook(topic string, hook Hook) {
+	if hook == nil {
+		return
+	}
+	Topic := bus.getTopic(topic)
+	Topic.hook = hook
+	bus.topicMap.Store(topic, Topic)
+}
 
 func (bus *eventBus) WaitAsync() {
 	bus.wg.Wait()

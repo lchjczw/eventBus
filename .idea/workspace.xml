@@ -6,8 +6,16 @@
   <component name="ChangeListManager">
     <list default="true" id="6ae86e73-e9cd-41c6-bb9c-ff64a94871d5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Controller.go" beforeDir="false" afterPath="$PROJECT_DIR$/Controller.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cycle.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/EventBus.go" beforeDir="false" afterPath="$PROJECT_DIR$/EventBus.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Publisher.go" beforeDir="false" afterPath="$PROJECT_DIR$/Publisher.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/event/cycle.go" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/event/event.go" beforeDir="false" afterPath="$PROJECT_DIR$/event/event.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/event/example/manage/root.go" beforeDir="false" afterPath="$PROJECT_DIR$/event/example/manage/root.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/event/example/manage/subcribe/subcribe.go" beforeDir="false" afterPath="$PROJECT_DIR$/event/example/manage/subcribe/subcribe.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/event/example/order/order.go" beforeDir="false" afterPath="$PROJECT_DIR$/event/example/order/order.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/event/example/sale/sale.go" beforeDir="false" afterPath="$PROJECT_DIR$/event/example/sale/sale.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/unitTest/pub_sub_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/unitTest/pub_sub_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,7 +75,19 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestSetCycleError in gitee.com/super_step/eventBus/unitTest">
+  <component name="RunManager" selected="Go Test.TestEvent in gitee.com/super_step/eventBus/event/example/manage/subcribe">
+    <configuration name="TestCycleError in gitee.com/super_step/eventBus/unitTest" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="eventBus" />
+      <working_directory value="$PROJECT_DIR$/unitTest" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="gitee.com/super_step/eventBus/unitTest" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestCycleError\E$" />
+      <method v="2" />
+    </configuration>
     <configuration name="TestEvent in gitee.com/super_step/eventBus/event/example/init" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="eventBus" />
       <working_directory value="$PROJECT_DIR$/event/example/init" />
@@ -104,18 +124,6 @@
       <pattern value="^\QTestEvent\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestPublish in gitee.com/super_step/eventBus/unitTest" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="eventBus" />
-      <working_directory value="$PROJECT_DIR$/unitTest" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="gitee.com/super_step/eventBus/unitTest" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestPublish\E$" />
-      <method v="2" />
-    </configuration>
     <configuration name="TestSetCycleError in gitee.com/super_step/eventBus/unitTest" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="eventBus" />
       <working_directory value="$PROJECT_DIR$/unitTest" />
@@ -130,17 +138,27 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Test.TestSetCycleError in gitee.com/super_step/eventBus/unitTest" />
         <item itemvalue="Go Test.TestEvent in gitee.com/super_step/eventBus/event/example/manage/subcribe" />
+        <item itemvalue="Go Test.TestCycleError in gitee.com/super_step/eventBus/unitTest" />
+        <item itemvalue="Go Test.TestSetCycleError in gitee.com/super_step/eventBus/unitTest" />
         <item itemvalue="Go Test.TestEvent in gitee.com/super_step/eventBus/event/example/manage/init" />
         <item itemvalue="Go Test.TestEvent in gitee.com/super_step/eventBus/event/example/init" />
-        <item itemvalue="Go Test.TestPublish in gitee.com/super_step/eventBus/unitTest" />
       </list>
     </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ID_ORDER">
+      <list>
+        <option value="Default.Root" />
+        <option value="Default.Author" />
+        <option value="Default.Date" />
+        <option value="Default.Subject" />
+      </list>
+    </option>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -183,17 +201,17 @@
         </line-breakpoint>
         <line-breakpoint type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/unitTest/pub_sub_test.go</url>
-          <line>126</line>
+          <line>118</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/event/example/order/order.go</url>
-          <line>11</line>
+          <line>26</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/event/example/sale/sale.go</url>
-          <line>16</line>
+          <line>17</line>
           <option name="timeStamp" value="10" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
@@ -208,13 +226,18 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/unitTest/pub_sub_test.go</url>
-          <line>154</line>
-          <option name="timeStamp" value="13" />
+          <line>94</line>
+          <option name="timeStamp" value="15" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/unitTest/pub_sub_test.go</url>
-          <line>50</line>
-          <option name="timeStamp" value="14" />
+          <line>102</line>
+          <option name="timeStamp" value="16" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/event/example/order/order.go</url>
+          <line>11</line>
+          <option name="timeStamp" value="17" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

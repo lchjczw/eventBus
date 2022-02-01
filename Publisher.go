@@ -44,8 +44,8 @@ func (bus *eventBus) publishSync(topic string, wait bool, events ...interface{})
 	wg := &sync.WaitGroup{}
 	publishStore.Set("waitGroup", wg)
 	Topic := bus.getTopic(topic)
-	if Topic.beforeCallback != nil {
-		err := Topic.beforeCallback(topic, publishStore, events...)
+	if Topic.hook != nil {
+		err := Topic.hook.Before(topic, publishStore, events...)
 		if err != nil {
 			err = myError.Warp(err, "前置生命周期出错, 流程停止")
 			bus.wg.Done()
@@ -54,8 +54,8 @@ func (bus *eventBus) publishSync(topic string, wait bool, events ...interface{})
 	}
 	bus.callAsync(topic, publishStore, events, Topic)
 	err := bus.callSync(topic, publishStore, events, Topic)
-	if Topic.afterSyncCallback != nil {
-		Topic.afterSyncCallback(topic, publishStore, events...)
+	if Topic.hook != nil {
+		Topic.hook.AfterSync(topic, publishStore, events...)
 	}
 	if wait {
 		bus.waitAsync(topic, publishStore, wg, Topic, events...)
@@ -69,8 +69,8 @@ func (bus *eventBus) publishSync(topic string, wait bool, events ...interface{})
 }
 
 func (bus *eventBus) waitAsync(topic string, store *memstore.Store, wg *sync.WaitGroup, Topic *topic, events ...interface{}) {
-	if Topic.afterCallback != nil {
-		Topic.afterCallback(topic, store, events...)
+	if Topic.hook != nil {
+		Topic.hook.After(topic, store, events...)
 	}
 	wg.Wait()
 	bus.wg.Done()
@@ -90,8 +90,8 @@ func (bus *eventBus) callSync(topic string, ctx *memstore.Store, events []interf
 		err := syncHandler.Callback(topic, ctx, events...)
 		if err != nil {
 			bus.logger.Errorf("eventBus(sync): %s%v#%s", topic, events, err.Error())
-			if Topic.onErrorCallback != nil {
-				Topic.onErrorCallback(topic, ctx, err, events...)
+			if Topic.hook != nil {
+				Topic.hook.Error(topic, ctx, err, events...)
 			}
 			if Topic.transaction {
 				return err
@@ -124,8 +124,8 @@ func (bus *eventBus) callAsync(topic string, store *memstore.Store, events []int
 				err, ok := result[0].Interface().(error)
 				if ok && err != nil {
 					bus.logger.Errorf("eventBus(async): %s%v#%s", topic, events, err.Error())
-					if Topic.onErrorCallback != nil {
-						Topic.onErrorCallback(topic, store, err, events...)
+					if Topic.hook != nil {
+						Topic.hook.Error(topic, store, err, events...)
 					}
 				}
 			}

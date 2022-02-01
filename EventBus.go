@@ -11,18 +11,6 @@ type EventBus interface {
 	Publisher
 	Subscriber
 	Controller
-	Cycle
-}
-
-type Cycle interface {
-	// 设置发布时回调
-	SetCycleBefore(topic string, callback BeforeCallback)
-	// 设置同步完成时回调
-	SetCycleAfterSync(topic string, callback CycleCallback)
-	// 设置全部完成时回调
-	SetCycleAfterAll(topic string, callback CycleCallback)
-	// 设置错误时回调
-	SetCycleError(topic string, onError ErrorCallback)
 }
 
 type Controller interface {
@@ -30,6 +18,8 @@ type Controller interface {
 	WaitAsync()
 	// 设置同步订阅事务标记
 	SetTransaction(topic string, tr bool)
+	// 设置hook
+	SetHook(topic string, hook Hook)
 	// 关闭主题
 	CloseTopic(topic string)
 }
@@ -54,15 +44,18 @@ type Subscriber interface {
 	UnSubscribeAll(callback Callback)
 }
 
-// 因为会导致重复订阅,所以必须用interface的形式
+// Callback 因为会导致重复订阅,所以必须用interface的形式
 // type Callback = func(string, context.Context, ...interface{}) error
 type Callback interface {
 	Callback(topic string, ctx *memstore.Store, events ...interface{}) error
 }
 
-type CycleCallback = func(topic string, ctx *memstore.Store, events ...interface{})
-type BeforeCallback = func(topic string, ctx *memstore.Store, events ...interface{}) error
-type ErrorCallback = func(topic string, ctx *memstore.Store, err error, events ...interface{})
+type Hook interface {
+	Before(topic string, ctx *memstore.Store, events ...interface{}) error
+	AfterSync(topic string, ctx *memstore.Store, events ...interface{})
+	After(topic string, ctx *memstore.Store, events ...interface{})
+	Error(topic string, ctx *memstore.Store, err error, events ...interface{})
+}
 
 type eventBus struct {
 	topicMap sync.Map
@@ -77,13 +70,14 @@ type topic struct {
 	// 区分异步handlers和同步handlers
 	//  异步handlers用set底层实现
 	//  同步handlers用切片实现
-	syncHandlers      []Callback
-	asyncHandlers     mapSet.Set
-	transaction       bool
-	beforeCallback    BeforeCallback
-	afterSyncCallback CycleCallback
-	afterCallback     CycleCallback
-	onErrorCallback   ErrorCallback
+	syncHandlers  []Callback
+	asyncHandlers mapSet.Set
+	transaction   bool
+	//Before    BeforeCallback
+	//AfterSync CycleCallback
+	//After     CycleCallback
+	//Error   ErrorCallback
+	hook Hook
 	sync.RWMutex
 }
 

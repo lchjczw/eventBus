@@ -8,12 +8,33 @@ import (
 
 type OrderEvent struct{}
 
-func (OrderEvent) Callback(topic string, ctx *memstore.Store, events ...interface{}) error {
-	fmt.Printf("topic:%s 订单事件:%v", topic, events)
+func (e *OrderEvent) Before(topic string, ctx *memstore.Store, events ...interface{}) error {
+	fmt.Println("before:", topic)
+	//return errors.New(fmt.Sprintf("before:检查发生错误"))
+	return nil
+}
+
+func (e *OrderEvent) AfterSync(topic string, ctx *memstore.Store, events ...interface{}) {
+}
+
+func (e *OrderEvent) After(topic string, ctx *memstore.Store, events ...interface{}) {
+}
+
+func (e *OrderEvent) Error(topic string, ctx *memstore.Store, err error, events ...interface{}) {
+}
+
+func (e *OrderEvent) Callback(topic string, ctx *memstore.Store, events ...interface{}) error {
+	fmt.Printf("topic:%s 订单事件:%v\n", topic, events)
 	return nil
 }
 
 func Order() {
-	manage.Sale.PublishSyncNoWait(1, "2314")
-	manage.Order.PublishSyncNoWait("lchjczw")
+	err:=manage.Sale.PublishSyncNoWait(1, "order -> sale")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	err = manage.Order.PublishSyncNoWait("order -> order")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 }

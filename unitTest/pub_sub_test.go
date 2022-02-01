@@ -20,7 +20,7 @@ const (
 var (
 	testBus   eventBus.EventBus
 	callbacks []eventBus.Callback
-	testCycle cycle
+	testHook  MyHook
 )
 
 type callback struct {
@@ -29,51 +29,43 @@ type callback struct {
 	Recursion bool
 }
 
-type cycle struct {
+type MyHook struct {
 	BeforeFlag      bool
 	AfterFlag       bool
 	AfterSyncFlag   bool
 	OnErrorFlag     bool
 	StoreCount      int
-	BeforeErrorFlag bool
 	AfterCount      int
 	AfterSyncCount  int
 }
 
-func (cycle *cycle) OnBefore(topic string, ctx *memstore.Store, events ...interface{}) error {
+func (cycle *MyHook) Before(topic string, ctx *memstore.Store, events ...interface{}) error {
 	ctx.Set("count", cycle.StoreCount)
-	golog.Default.Infof("OnBefore %s: %+v", topic, events)
+	golog.Default.Infof("Before %s: %+v", topic, events)
 	cycle.BeforeFlag = true
 	return nil
 }
 
-func (cycle *cycle) OnBeforeError(topic string, ctx *memstore.Store, events ...interface{}) error {
-	ctx.Set("count", cycle.StoreCount)
-	golog.Default.Infof("OnBeforeError %s: %+v", topic, events)
-	cycle.BeforeErrorFlag = true
-	return errors.New("OnBeforeError")
-}
-
-func (cycle *cycle) OnAfter(topic string, ctx *memstore.Store, events ...interface{}) {
+func (cycle *MyHook) After(topic string, ctx *memstore.Store, events ...interface{}) {
 	count, _ := ctx.GetInt("count")
 	cycle.StoreCount = count + 1
 	cycle.AfterCount++
 	ctx.Set("count", cycle.StoreCount)
-	golog.Default.Infof("OnAfter %s: %+v", topic, events)
+	golog.Default.Infof("After %s: %+v", topic, events)
 	cycle.AfterFlag = true
 }
 
-func (cycle *cycle) OnAfterSync(topic string, ctx *memstore.Store, events ...interface{}) {
+func (cycle *MyHook) AfterSync(topic string, ctx *memstore.Store, events ...interface{}) {
 	count, _ := ctx.GetInt("count")
 	cycle.StoreCount = count + 1
 	cycle.AfterSyncCount++
 	ctx.Set("count", cycle.StoreCount)
-	golog.Default.Infof("OnAfterSync %s: %+v", topic, events)
+	golog.Default.Infof("AfterSync %s: %+v", topic, events)
 	cycle.AfterSyncFlag = true
 }
 
-func (cycle *cycle) OnError(topic string, ctx *memstore.Store, err error, events ...interface{}) {
-	golog.Default.Infof("OnError %s: %+v %s", topic, events, err.Error())
+func (cycle *MyHook) Error(topic string, ctx *memstore.Store, err error, events ...interface{}) {
+	golog.Default.Infof("Error %s: %+v %s", topic, events, err.Error())
 	cycle.OnErrorFlag = true
 }
 
@@ -152,53 +144,45 @@ func TestPublishSync(t *testing.T) {
 }
 
 func TestSetCycleError(t *testing.T) {
-	testBus.SetCycleBefore(asyncTopic, testCycle.OnBeforeError)
-	testBus.SetCycleBefore(syncTopic, testCycle.OnBeforeError)
+	testBus.SetHook(asyncTopic, &testHook)
+	testBus.SetHook(syncTopic, &testHook)
+
 	TestPublish(t)
 	TestPublishSync(t)
 }
 
 func TestCycleError(t *testing.T) {
-	if !testCycle.BeforeErrorFlag {
-		t.Error("CycleBeforeErrorFlag回调失败")
+	if testHook.AfterCount > 0 {
+		t.Errorf("CycleBeforeError逻辑出错: %d", testHook.StoreCount)
 	}
-	if testCycle.AfterCount > 0 {
-		t.Errorf("CycleBeforeError逻辑出错: %d", testCycle.StoreCount)
-	}
-	if testCycle.AfterSyncCount > 0 {
-		t.Errorf("CycleBeforeError逻辑出错: %d", testCycle.StoreCount)
+	if testHook.AfterSyncCount > 0 {
+		t.Errorf("CycleBeforeError逻辑出错: %d", testHook.StoreCount)
 	}
 }
 
 func TestSetCycle(t *testing.T) {
-	testBus.SetCycleBefore(asyncTopic, testCycle.OnBefore)
-	testBus.SetCycleAfterAll(asyncTopic, testCycle.OnAfter)
-	testBus.SetCycleAfterSync(asyncTopic, testCycle.OnAfterSync)
-	testBus.SetCycleError(asyncTopic, testCycle.OnError)
-	testBus.SetCycleBefore(syncTopic, testCycle.OnBefore)
-	testBus.SetCycleAfterAll(syncTopic, testCycle.OnAfter)
-	testBus.SetCycleAfterSync(syncTopic, testCycle.OnAfterSync)
-	testBus.SetCycleError(syncTopic, testCycle.OnError)
+	testBus.SetHook(asyncTopic, &testHook)
+	testBus.SetHook(syncTopic, &testHook)
 	TestPublish(t)
 	TestPublishSync(t)
 }
 
 func TestCycle(t *testing.T) {
 	testBus.WaitAsync()
-	if !testCycle.BeforeFlag {
+	if !testHook.BeforeFlag {
 		t.Error("CycleBefore回调失败")
 	}
-	if !testCycle.AfterFlag {
+	if !testHook.AfterFlag {
 		t.Error("CycleAfter回调失败")
 	}
-	if !testCycle.AfterSyncFlag {
+	if !testHook.AfterSyncFlag {
 		t.Error("CycleAfterSync回调失败")
 	}
-	if !testCycle.OnErrorFlag {
+	if !testHook.OnErrorFlag {
 		t.Error("CycleOnError回调失败")
 	}
-	if testCycle.StoreCount == 0 {
-		t.Errorf("Store测试失败: %d", testCycle.StoreCount)
+	if testHook.StoreCount == 0 {
+		t.Errorf("Store测试失败: %d", testHook.StoreCount)
 	}
 }
 
@@ -269,7 +253,7 @@ func TestMain(m *testing.M) {
 	golog.Default.SetTimeFormat("2006-01-02 15:04:05")
 	golog.Default.SetLevel("debug")
 	testBus = eventBus.NewBus(golog.Default)
-	testCycle = cycle{}
+	testHook = MyHook{}
 	for i := 0; i < 4; i++ {
 		callbackStruck := newCallback(fmt.Sprintf("%d", i), i == 2)
 		callbacks = append(callbacks, callbackStruck)

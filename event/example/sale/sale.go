@@ -8,12 +8,13 @@ import (
 
 type SaleEvent struct{}
 
-func (SaleEvent) Callback(topic string, ctx *memstore.Store, events ...interface{}) error {
-	fmt.Printf("topic:%s 销售单事件:%v", topic, events)
+func (s *SaleEvent) Callback(topic string, ctx *memstore.Store, events ...interface{}) error {
+	fmt.Printf("topic:%s 销售单事件:%v\n", topic, events)
+
 	return nil
 }
 
 func Sale() {
-	manage.Sale.PublishSyncNoWait(1, "2314")
-	manage.Order.PublishSyncNoWait("lchjczw")
+	manage.Sale.PublishSyncNoWait(1, "sale -> sale")
+	manage.Order.PublishSyncNoWait("sale -> order")
 }

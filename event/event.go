@@ -72,7 +72,7 @@ func (a *Event) Key() string {
 		t = t.prent
 
 	}
-	return "/" + key
+	return key
 }
 func (a *Event) Event(topic, desc string) *Event {
 	if err := a.Check(topic); err != nil {
@@ -103,7 +103,18 @@ func (a *Event) PublishSyncNoWait(args ...interface{}) error {
 // Register 注册
 func (a *Event) Register(callback eventBus.Callback) error {
 	a.callBack = callback
-	return a.bus.Register(a.Key(), callback)
+	err := a.bus.Register(a.Key(), callback)
+	if err != nil {
+		return err
+	}
+	//hook eventBus.Hook
+
+	hook, ok := callback.(eventBus.Hook)
+	if ok {
+		a.bus.SetHook(a.Key(), hook)
+	}
+
+	return nil
 }
 
 func (a *Event) RegisterAsync(callback eventBus.Callback) error {

@@ -27,8 +27,8 @@
    
    var handler subHandler
    
-   func (sub *subHandler) Handler(topic string, events ...interface{}) error {
-   	config.Logger.Infof("event:%s%v", topic, events)
+   func (sub *subHandler) Handler(topic string, args ...interface{}) error {
+   	config.Logger.Infof("event:%s%v", topic, args)
    	return nil
    }
    

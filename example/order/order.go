@@ -8,23 +8,23 @@ import (
 
 type OrderEvent struct{}
 
-func (e *OrderEvent) Before(topic string, ctx *memstore.Store, events ...interface{}) error {
+func (e *OrderEvent) Before(topic string, ctx *memstore.Store, args ...interface{}) error {
 	fmt.Println("before:", topic)
 	//return errors.New(fmt.Sprintf("before:检查发生错误"))
 	return nil
 }
 
-func (e *OrderEvent) AfterSync(topic string, ctx *memstore.Store, events ...interface{}) {
+func (e *OrderEvent) AfterSync(topic string, ctx *memstore.Store, args ...interface{}) {
 }
 
-func (e *OrderEvent) After(topic string, ctx *memstore.Store, events ...interface{}) {
+func (e *OrderEvent) After(topic string, ctx *memstore.Store, args ...interface{}) {
 }
 
-func (e *OrderEvent) Error(topic string, ctx *memstore.Store, err error, events ...interface{}) {
+func (e *OrderEvent) Error(topic string, ctx *memstore.Store, err error, args ...interface{}) {
 }
 
-func (e *OrderEvent) Handler(topic string, ctx *memstore.Store, events ...interface{}) error {
-	fmt.Printf("topic:%s 订单事件:%v\n", topic, events)
+func (e *OrderEvent) Handler(topic string, ctx *memstore.Store, args ...interface{}) error {
+	fmt.Printf("topic:%s 订单事件:%v\n", topic, args)
 	return nil
 }
 

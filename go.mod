@@ -1,4 +1,4 @@
-module gitee.com/super_step/eventBus
+module github.com/lchjczw/eventBus
 
 go 1.17
 

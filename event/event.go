@@ -2,7 +2,7 @@ package event
 
 import (
 	"errors"
-	"gitee.com/super_step/eventBus"
+	"github.com/lchjczw/eventBus"
 	"github.com/kataras/golog"
 	"strings"
 	"sync"

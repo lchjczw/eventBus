@@ -3,9 +3,9 @@ package unitTest
 import (
 	"errors"
 	"fmt"
-	"gitee.com/super_step/eventBus"
-	"gitee.com/super_step/eventBus/pkg/memstore"
 	"github.com/kataras/golog"
+	"github.com/lchjczw/eventBus"
+	"github.com/lchjczw/eventBus/pkg/memstore"
 	"testing"
 )
 

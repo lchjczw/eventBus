@@ -1,8 +1,8 @@
 package eventBus
 
 import (
-	"gitee.com/super_step/eventBus/pkg/myError"
-	"gitee.com/super_step/eventBus/pkg/memstore"
+	"github.com/lchjczw/eventBus/pkg/memstore"
+	"github.com/lchjczw/eventBus/pkg/myError"
 	"reflect"
 	"sync"
 )

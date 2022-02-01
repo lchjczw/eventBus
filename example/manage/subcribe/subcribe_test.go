@@ -1,8 +1,8 @@
 package subcribe
 
 import (
-	"gitee.com/super_step/eventBus/example/order"
-	"gitee.com/super_step/eventBus/example/sale"
+	"github.com/lchjczw/eventBus/example/order"
+	"github.com/lchjczw/eventBus/example/sale"
 	"testing"
 )
 

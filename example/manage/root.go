@@ -1,7 +1,7 @@
 package manage
 
 import (
-	"gitee.com/super_step/eventBus/event"
+	"github.com/lchjczw/eventBus/event"
 )
 
 var (

@@ -2,8 +2,8 @@ package sale
 
 import (
 	"fmt"
-	"gitee.com/super_step/eventBus/example/manage"
-	"gitee.com/super_step/eventBus/pkg/memstore"
+	"github.com/lchjczw/eventBus/example/manage"
+	"github.com/lchjczw/eventBus/pkg/memstore"
 )
 
 type SaleEvent struct{}

@@ -8,12 +8,12 @@ import (
 )
 
 // 同步订阅主题
-func (bus *eventBus) Subscribe(topic string, callback Callback) error {
+func (bus *eventBus) Register(topic string, callback Callback) error {
 	return bus.subscribe(topic, callback, false)
 }
 
 // 异步订阅主题
-func (bus *eventBus) SubscribeAsync(topic string, callback Callback) error {
+func (bus *eventBus) RegisterAsync(topic string, callback Callback) error {
 	return bus.subscribe(topic, callback, true)
 }
 

@@ -45,9 +45,9 @@ type Publisher interface {
 
 type Subscriber interface {
 	// 同步订阅主题
-	Subscribe(topic string, callback Callback) error
+	Register(topic string, callback Callback) error
 	// 异步订阅主题
-	SubscribeAsync(topic string, callback Callback) error
+	RegisterAsync(topic string, callback Callback) error
 	// 取消已订阅的主题
 	UnSubscribe(topic string, callback Callback)
 	// 取消所有已订阅的主题

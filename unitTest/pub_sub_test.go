@@ -94,12 +94,12 @@ func (callback *callback) Callback(topic string, ctx *memstore.Store, events ...
 
 func TestSub(t *testing.T) {
 	for index, callback := range callbacks {
-		err := testBus.Subscribe(syncTopic, callback)
+		err := testBus.Register(syncTopic, callback)
 		if err != nil {
 			t.Error(index, err.Error())
 			return
 		}
-		err = testBus.Subscribe(syncTopic, callback)
+		err = testBus.Register(syncTopic, callback)
 		if err == nil {
 			t.Error("重复订阅未报告异常")
 			return
@@ -109,12 +109,12 @@ func TestSub(t *testing.T) {
 
 func TestSubAsync(t *testing.T) {
 	for index, callback := range callbacks {
-		err := testBus.SubscribeAsync(asyncTopic, callback)
+		err := testBus.RegisterAsync(asyncTopic, callback)
 		if err != nil {
 			t.Error(index, err.Error())
 			return
 		}
-		err = testBus.SubscribeAsync(asyncTopic, callback)
+		err = testBus.RegisterAsync(asyncTopic, callback)
 		if err == nil {
 			t.Error("重复订阅未报告异常")
 			return
@@ -243,7 +243,7 @@ func TestRecursionSub(t *testing.T) {
 		Err:       false,
 		Recursion: true,
 	}
-	err := testBus.Subscribe(syncTopic, &callbackRecursion)
+	err := testBus.Register(syncTopic, &callbackRecursion)
 	if err != nil {
 		t.Error("Recursion", err.Error())
 		return

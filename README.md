@@ -43,7 +43,7 @@
    ```go
    func sub() {
      // 同步订阅（收到事件后，按注册顺序同步执行handler）
-     err := EventBus.Subscribe("topic:test", &handler)
+     err := EventBus.SubscribeSync("topic:test", &handler)
      if err != nil {
        golog.Default.Error(err.Error())
      }
@@ -60,7 +60,7 @@
    ```go
    func pub() {
      // 异步发布，发布完成后不等待处理结果，立即返回
-     EventBus.Publish("topic:test", "event:async")
+     EventBus.PublishAsync("topic:test", "event:async")
      // 同步发布, 发布完成后等待同步与异步订阅全部完成后，返回同步订阅执行结果
      err := EventBus.PublishSync("topic:test", "event:sync")
      if err != nil {
@@ -98,10 +98,3 @@
 #### demo
 
 请参考`unitTest/pub_sub_test.go`
-
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request

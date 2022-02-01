@@ -67,6 +67,7 @@
       <recent name="$PROJECT_DIR$" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/core" />
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
@@ -186,16 +187,16 @@
       <breakpoints>
         <line-breakpoint type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/event/event.go</url>
-          <line>96</line>
+          <line>95</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/Subscriber.go</url>
+          <url>file://$PROJECT_DIR$/core/Subscriber.go</url>
           <line>11</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/unitTest/pub_sub_test.go</url>
+          <url>file://$PROJECT_DIR$/core/unitTest/pub_sub_test.go</url>
           <line>115</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
@@ -216,16 +217,16 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/event/event.go</url>
-          <line>83</line>
+          <line>82</line>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/unitTest/pub_sub_test.go</url>
+          <url>file://$PROJECT_DIR$/core/unitTest/pub_sub_test.go</url>
           <line>91</line>
           <option name="timeStamp" value="15" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/unitTest/pub_sub_test.go</url>
+          <url>file://$PROJECT_DIR$/core/unitTest/pub_sub_test.go</url>
           <line>99</line>
           <option name="timeStamp" value="16" />
         </line-breakpoint>

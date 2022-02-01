@@ -26,11 +26,11 @@ type Controller interface {
 
 type Publisher interface {
 	// 异步发布
-	PublishAsync(topic string, events ...interface{})
+	PublishAsync(topic string, args ...interface{})
 	// 同步发布
-	PublishSync(topic string, events ...interface{}) error
+	PublishSync(topic string, args ...interface{}) error
 	// 同步发布, 不等待异步调用完成
-	PublishSyncNoWait(topic string, events ...interface{}) error
+	PublishSyncNoWait(topic string, args ...interface{}) error
 }
 
 type Subscriber interface {
@@ -47,18 +47,18 @@ type Subscriber interface {
 // Callback 因为会导致重复订阅,所以必须用interface的形式
 // type Callback = func(string, context.Context, ...interface{}) error
 type Callback interface {
-	Callback(topic string, ctx *memstore.Store, events ...interface{}) error
+	Callback(topic string, ctx *memstore.Store, args ...interface{}) error
 }
 
 type Hook interface {
 	// 发布前回调
-	Before(topic string, ctx *memstore.Store, events ...interface{}) error
+	Before(topic string, ctx *memstore.Store, args ...interface{}) error
 	// 同步完成时回调
-	AfterSync(topic string, ctx *memstore.Store, events ...interface{})
+	AfterSync(topic string, ctx *memstore.Store, args ...interface{})
 	// 全部完成时回调
-	After(topic string, ctx *memstore.Store, events ...interface{})
+	After(topic string, ctx *memstore.Store, args ...interface{})
 	// 错误时回调
-	Error(topic string, ctx *memstore.Store, err error, events ...interface{})
+	Error(topic string, ctx *memstore.Store, err error, args ...interface{})
 }
 
 type eventBus struct {
@@ -68,7 +68,7 @@ type eventBus struct {
 	EventBus
 }
 
-type CallbackFunc = func(topic string, events ...interface{}) error
+type CallbackFunc = func(topic string, args ...interface{}) error
 
 type topic struct {
 	// 区分异步handlers和同步handlers

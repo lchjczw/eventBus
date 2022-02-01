@@ -39,41 +39,41 @@ type MyHook struct {
 	AfterSyncCount  int
 }
 
-func (cycle *MyHook) Before(topic string, ctx *memstore.Store, events ...interface{}) error {
+func (cycle *MyHook) Before(topic string, ctx *memstore.Store, args ...interface{}) error {
 	ctx.Set("count", cycle.StoreCount)
-	golog.Default.Infof("Before %s: %+v", topic, events)
+	golog.Default.Infof("Before %s: %+v", topic, args)
 	cycle.BeforeFlag = true
 	return nil
 }
 
-func (cycle *MyHook) After(topic string, ctx *memstore.Store, events ...interface{}) {
+func (cycle *MyHook) After(topic string, ctx *memstore.Store, args ...interface{}) {
 	count, _ := ctx.GetInt("count")
 	cycle.StoreCount = count + 1
 	cycle.AfterCount++
 	ctx.Set("count", cycle.StoreCount)
-	golog.Default.Infof("After %s: %+v", topic, events)
+	golog.Default.Infof("After %s: %+v", topic, args)
 	cycle.AfterFlag = true
 }
 
-func (cycle *MyHook) AfterSync(topic string, ctx *memstore.Store, events ...interface{}) {
+func (cycle *MyHook) AfterSync(topic string, ctx *memstore.Store, args ...interface{}) {
 	count, _ := ctx.GetInt("count")
 	cycle.StoreCount = count + 1
 	cycle.AfterSyncCount++
 	ctx.Set("count", cycle.StoreCount)
-	golog.Default.Infof("AfterSync %s: %+v", topic, events)
+	golog.Default.Infof("AfterSync %s: %+v", topic, args)
 	cycle.AfterSyncFlag = true
 }
 
-func (cycle *MyHook) Error(topic string, ctx *memstore.Store, err error, events ...interface{}) {
-	golog.Default.Infof("Error %s: %+v %s", topic, events, err.Error())
+func (cycle *MyHook) Error(topic string, ctx *memstore.Store, err error, args ...interface{}) {
+	golog.Default.Infof("Error %s: %+v %s", topic, args, err.Error())
 	cycle.OnErrorFlag = true
 }
 
-func (callback *callback) Callback(topic string, ctx *memstore.Store, events ...interface{}) error {
-	if len(events) == 0 {
+func (callback *callback) Callback(topic string, ctx *memstore.Store, args ...interface{}) error {
+	if len(args) == 0 {
 		golog.Default.Infof("%s# %s: %v", callback.Name, topic, "Recursioned")
 	} else {
-		golog.Default.Infof("%s# %s: %v", callback.Name, topic, events)
+		golog.Default.Infof("%s# %s: %v", callback.Name, topic, args)
 		if callback.Recursion {
 			testBus.PublishAsync(topic)
 		}

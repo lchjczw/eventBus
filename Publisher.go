@@ -8,25 +8,25 @@ import (
 )
 
 // 异步发布
-func (bus *eventBus) PublishAsync(topic string, events ...interface{}) {
+func (bus *eventBus) PublishAsync(topic string, args ...interface{}) {
 	bus.wg.Add(1)
-	bus.logger.Debugf("asyncPublish topic:%s events:%v", topic, events)
-	go bus.publish(topic, events...)
+	bus.logger.Debugf("asyncPublish topic:%s args:%v", topic, args)
+	go bus.publish(topic, args...)
 	return
 }
 
 // 同步发布
-func (bus *eventBus) PublishSync(topic string, events ...interface{}) error {
+func (bus *eventBus) PublishSync(topic string, args ...interface{}) error {
 	bus.wg.Add(1)
-	bus.logger.Debugf("syncPublish topic:%s events:%v", topic, events)
-	return bus.publishSync(topic, false, events...)
+	bus.logger.Debugf("syncPublish topic:%s args:%v", topic, args)
+	return bus.publishSync(topic, false, args...)
 }
 
 // 同步发布, 不等待异步操作完成
-func (bus *eventBus) PublishSyncNoWait(topic string, events ...interface{}) error {
+func (bus *eventBus) PublishSyncNoWait(topic string, args ...interface{}) error {
 	bus.wg.Add(1)
-	bus.logger.Debugf("syncPublishNoWait topic:%s events:%v", topic, events)
-	return bus.publishSync(topic, false, events...)
+	bus.logger.Debugf("syncPublishNoWait topic:%s args:%v", topic, args)
+	return bus.publishSync(topic, false, args...)
 }
 
 func (bus *eventBus) CloseTopic(topic string) {
@@ -34,33 +34,33 @@ func (bus *eventBus) CloseTopic(topic string) {
 	return
 }
 
-func (bus *eventBus) publish(topic string, events ...interface{}) {
-	_ = bus.publishSync(topic, true, events...)
+func (bus *eventBus) publish(topic string, args ...interface{}) {
+	_ = bus.publishSync(topic, true, args...)
 	return
 }
 
-func (bus *eventBus) publishSync(topic string, wait bool, events ...interface{}) error {
+func (bus *eventBus) publishSync(topic string, wait bool, args ...interface{}) error {
 	publishStore := &memstore.Store{}
 	wg := &sync.WaitGroup{}
 	publishStore.Set("waitGroup", wg)
 	Topic := bus.getTopic(topic)
 	if Topic.hook != nil {
-		err := Topic.hook.Before(topic, publishStore, events...)
+		err := Topic.hook.Before(topic, publishStore, args...)
 		if err != nil {
 			err = myError.Warp(err, "前置生命周期出错, 流程停止")
 			bus.wg.Done()
 			return err
 		}
 	}
-	bus.callAsync(topic, publishStore, events, Topic)
-	err := bus.callSync(topic, publishStore, events, Topic)
+	bus.callAsync(topic, publishStore, args, Topic)
+	err := bus.callSync(topic, publishStore, args, Topic)
 	if Topic.hook != nil {
-		Topic.hook.AfterSync(topic, publishStore, events...)
+		Topic.hook.AfterSync(topic, publishStore, args...)
 	}
 	if wait {
-		bus.waitAsync(topic, publishStore, wg, Topic, events...)
+		bus.waitAsync(topic, publishStore, wg, Topic, args...)
 	} else {
-		go bus.waitAsync(topic, publishStore, wg, Topic, events...)
+		go bus.waitAsync(topic, publishStore, wg, Topic, args...)
 	}
 	if err != nil {
 		return err
@@ -68,9 +68,9 @@ func (bus *eventBus) publishSync(topic string, wait bool, events ...interface{})
 	return err
 }
 
-func (bus *eventBus) waitAsync(topic string, store *memstore.Store, wg *sync.WaitGroup, Topic *topic, events ...interface{}) {
+func (bus *eventBus) waitAsync(topic string, store *memstore.Store, wg *sync.WaitGroup, Topic *topic, args ...interface{}) {
 	if Topic.hook != nil {
-		Topic.hook.After(topic, store, events...)
+		Topic.hook.After(topic, store, args...)
 	}
 	wg.Wait()
 	bus.wg.Done()
@@ -78,7 +78,7 @@ func (bus *eventBus) waitAsync(topic string, store *memstore.Store, wg *sync.Wai
 }
 
 // 执行同步订阅回调
-func (bus *eventBus) callSync(topic string, ctx *memstore.Store, events []interface{}, Topic *topic) error {
+func (bus *eventBus) callSync(topic string, ctx *memstore.Store, args []interface{}, Topic *topic) error {
 	Topic.RLock()
 	syncHandlers := make([]Callback, len(Topic.syncHandlers))
 	if len(Topic.syncHandlers) > 0 {
@@ -87,11 +87,11 @@ func (bus *eventBus) callSync(topic string, ctx *memstore.Store, events []interf
 	Topic.RUnlock()
 	var tmpErr error
 	for _, syncHandler := range syncHandlers {
-		err := syncHandler.Callback(topic, ctx, events...)
+		err := syncHandler.Callback(topic, ctx, args...)
 		if err != nil {
-			bus.logger.Errorf("eventBus(sync): %s%v#%s", topic, events, err.Error())
+			bus.logger.Errorf("eventBus(sync): %s%v#%s", topic, args, err.Error())
 			if Topic.hook != nil {
-				Topic.hook.Error(topic, ctx, err, events...)
+				Topic.hook.Error(topic, ctx, err, args...)
 			}
 			if Topic.transaction {
 				return err
@@ -104,7 +104,7 @@ func (bus *eventBus) callSync(topic string, ctx *memstore.Store, events []interf
 }
 
 // 执行异步订阅回调
-func (bus *eventBus) callAsync(topic string, store *memstore.Store, events []interface{}, Topic *topic) {
+func (bus *eventBus) callAsync(topic string, store *memstore.Store, args []interface{}, Topic *topic) {
 	for _, asyncHandler := range Topic.asyncHandlers.ToSlice() {
 		callback, _ := asyncHandler.(reflect.Value)
 		waitGroup, _ := store.Get("waitGroup").(*sync.WaitGroup)
@@ -115,17 +115,17 @@ func (bus *eventBus) callAsync(topic string, store *memstore.Store, events []int
 				reflect.ValueOf(topic),
 				reflect.ValueOf(store),
 			}
-			for _, event := range events {
-				params = append(params, reflect.ValueOf(event))
+			for _, arg := range args {
+				params = append(params, reflect.ValueOf(arg))
 			}
 			callbackFunc := callback.MethodByName("Callback")
 			result := callbackFunc.Call(params)
 			if len(result) > 0 && !result[0].IsNil() {
 				err, ok := result[0].Interface().(error)
 				if ok && err != nil {
-					bus.logger.Errorf("eventBus(async): %s%v#%s", topic, events, err.Error())
+					bus.logger.Errorf("eventBus(async): %s%v#%s", topic, args, err.Error())
 					if Topic.hook != nil {
-						Topic.hook.Error(topic, store, err, events...)
+						Topic.hook.Error(topic, store, err, args...)
 					}
 				}
 			}

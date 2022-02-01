@@ -35,13 +35,13 @@ type Publisher interface {
 
 type Subscriber interface {
 	// 同步订阅主题
-	SubscribeSync(topic string, callback Handler) error
+	SubscribeSync(topic string, handler Handler) error
 	// 异步订阅主题
-	SubscribeAsync(topic string, callback Handler) error
+	SubscribeAsync(topic string, handler Handler) error
 	// 取消已订阅的主题
-	UnSubscribe(topic string, callback Handler)
+	UnSubscribe(topic string, handler Handler)
 	// 取消所有已订阅的主题
-	UnSubscribeAll(callback Handler)
+	UnSubscribeAll(handler Handler)
 }
 
 // Handler 因为会导致重复订阅,所以必须用interface的形式
@@ -68,7 +68,7 @@ type eventBus struct {
 	EventBus
 }
 
-type CallbackFunc = func(topic string, args ...interface{}) error
+type HandlerFunc = func(topic string, args ...interface{}) error
 
 type topic struct {
 	// 区分异步handlers和同步handlers
@@ -77,10 +77,7 @@ type topic struct {
 	syncHandlers  []Handler
 	asyncHandlers mapSet.Set
 	transaction   bool
-	//Before    BeforeCallback
-	//AfterSync CycleCallback
-	//After     CycleCallback
-	//Error   ErrorCallback
+
 	hook Hook
 	sync.RWMutex
 }

@@ -5,20 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6ae86e73-e9cd-41c6-bb9c-ff64a94871d5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/pkg/memstore/gob.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/memstore/memstore.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/memstore/memstore_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/EventBus.go" beforeDir="false" afterPath="$PROJECT_DIR$/EventBus.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/LICENSE" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Publisher.go" beforeDir="false" afterPath="$PROJECT_DIR$/Publisher.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Subscriber.go" beforeDir="false" afterPath="$PROJECT_DIR$/Subscriber.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/event/event.go" beforeDir="false" afterPath="$PROJECT_DIR$/event/event.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/event/example/manage/root.go" beforeDir="false" afterPath="$PROJECT_DIR$/example/manage/root.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/event/example/manage/subcribe/subcribe.go" beforeDir="false" afterPath="$PROJECT_DIR$/example/manage/subcribe/subcribe.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/event/example/manage/subcribe/subcribe_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/example/manage/subcribe/subcribe_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/event/example/order/order.go" beforeDir="false" afterPath="$PROJECT_DIR$/example/order/order.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/event/example/sale/sale.go" beforeDir="false" afterPath="$PROJECT_DIR$/example/sale/sale.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/unitTest/pub_sub_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/unitTest/pub_sub_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -85,7 +76,7 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestSub in gitee.com/super_step/eventBus/unitTest">
+  <component name="RunManager" selected="Go Test.TestEvent in gitee.com/super_step/eventBus/example/manage/subcribe">
     <configuration name="TestCycleError in gitee.com/super_step/eventBus/unitTest" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="eventBus" />
       <working_directory value="$PROJECT_DIR$/unitTest" />
@@ -98,24 +89,24 @@
       <pattern value="^\QTestCycleError\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestEvent in gitee.com/super_step/eventBus/event/example/manage/init" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="eventBus" />
-      <working_directory value="$PROJECT_DIR$/event/example/manage/init" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="gitee.com/super_step/eventBus/event/example/manage/init" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestEvent\E$" />
-      <method v="2" />
-    </configuration>
     <configuration name="TestEvent in gitee.com/super_step/eventBus/event/example/manage/subcribe" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="eventBus" />
       <working_directory value="$PROJECT_DIR$/event/example/manage/subcribe" />
       <root_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
       <package value="gitee.com/super_step/eventBus/event/example/manage/subcribe" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestEvent\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestEvent in gitee.com/super_step/eventBus/example/manage/subcribe" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="eventBus" />
+      <working_directory value="$PROJECT_DIR$/example/manage/subcribe" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="gitee.com/super_step/eventBus/example/manage/subcribe" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
@@ -148,11 +139,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestEvent in gitee.com/super_step/eventBus/example/manage/subcribe" />
         <item itemvalue="Go Test.TestSub in gitee.com/super_step/eventBus/unitTest" />
         <item itemvalue="Go Test.TestEvent in gitee.com/super_step/eventBus/event/example/manage/subcribe" />
         <item itemvalue="Go Test.TestCycleError in gitee.com/super_step/eventBus/unitTest" />
         <item itemvalue="Go Test.TestSetCycleError in gitee.com/super_step/eventBus/unitTest" />
-        <item itemvalue="Go Test.TestEvent in gitee.com/super_step/eventBus/event/example/manage/init" />
       </list>
     </recent_temporary>
   </component>

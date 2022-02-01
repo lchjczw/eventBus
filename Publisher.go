@@ -106,7 +106,7 @@ func (bus *eventBus) callSync(topic string, ctx *memstore.Store, args []interfac
 // 执行异步订阅回调
 func (bus *eventBus) callAsync(topic string, store *memstore.Store, args []interface{}, Topic *topic) {
 	for _, asyncHandler := range Topic.asyncHandlers.ToSlice() {
-		callback, _ := asyncHandler.(reflect.Value)
+		handler, _ := asyncHandler.(reflect.Value)
 		waitGroup, _ := store.Get("waitGroup").(*sync.WaitGroup)
 		waitGroup.Add(1)
 		go func() {
@@ -118,8 +118,8 @@ func (bus *eventBus) callAsync(topic string, store *memstore.Store, args []inter
 			for _, arg := range args {
 				params = append(params, reflect.ValueOf(arg))
 			}
-			callbackFunc := callback.MethodByName("Handler")
-			result := callbackFunc.Call(params)
+			handlerFunc := handler.MethodByName("Handler")
+			result := handlerFunc.Call(params)
 			if len(result) > 0 && !result[0].IsNil() {
 				err, ok := result[0].Interface().(error)
 				if ok && err != nil {

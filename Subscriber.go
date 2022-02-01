@@ -8,25 +8,25 @@ import (
 )
 
 // 同步订阅主题
-func (bus *eventBus) SubscribeSync(topic string, callback Handler) error {
-	return bus.subscribe(topic, callback, false)
+func (bus *eventBus) SubscribeSync(topic string, handler Handler) error {
+	return bus.subscribe(topic, handler, false)
 }
 
 // 异步订阅主题
-func (bus *eventBus) SubscribeAsync(topic string, callback Handler) error {
-	return bus.subscribe(topic, callback, true)
+func (bus *eventBus) SubscribeAsync(topic string, handler Handler) error {
+	return bus.subscribe(topic, handler, true)
 }
 
 // 取消订阅
-func (bus *eventBus) UnSubscribe(topic string, callback Handler) {
+func (bus *eventBus) UnSubscribe(topic string, handler Handler) {
 	Topic := bus.getTopic(topic)
-	reflectCallback := reflect.ValueOf(callback)
-	if Topic.asyncHandlers.Contains(reflectCallback) {
-		Topic.asyncHandlers.Remove(reflectCallback)
+	reflectHandler := reflect.ValueOf(handler)
+	if Topic.asyncHandlers.Contains(reflectHandler) {
+		Topic.asyncHandlers.Remove(reflectHandler)
 		return
 	}
 	Topic.Lock()
-	index := findCallback(Topic.syncHandlers, callback)
+	index := findHandler(Topic.syncHandlers, handler)
 	if index > -1 {
 		Topic.syncHandlers = removeFromSync(Topic.syncHandlers, index)
 	}
@@ -35,51 +35,51 @@ func (bus *eventBus) UnSubscribe(topic string, callback Handler) {
 }
 
 // 取消所有订阅
-func (bus *eventBus) UnSubscribeAll(callback Handler) {
+func (bus *eventBus) UnSubscribeAll(handler Handler) {
 	bus.topicMap.Range(func(topic, Topic interface{}) bool {
-		bus.UnSubscribe(topic.(string), callback)
+		bus.UnSubscribe(topic.(string), handler)
 		return true
 	})
 }
 
 // 订阅
-func (bus *eventBus) subscribe(topic string, callback Handler, async bool) error {
+func (bus *eventBus) subscribe(topic string, handler Handler, async bool) error {
 	Topic := bus.getTopic(topic)
-	if checkSub(Topic, callback) {
+	if checkSub(Topic, handler) {
 		return errors.New(fmt.Sprintf("topic:%s 重复订阅 ", topic))
 	}
 	if async {
-		reflectCallback := reflect.ValueOf(callback)
-		Topic.asyncHandlers.Add(reflectCallback)
+		reflectHandler := reflect.ValueOf(handler)
+		Topic.asyncHandlers.Add(reflectHandler)
 	} else {
 		Topic.Lock()
-		Topic.syncHandlers = append(Topic.syncHandlers, callback)
+		Topic.syncHandlers = append(Topic.syncHandlers, handler)
 		Topic.Unlock()
 	}
 	return nil
 }
 
-func checkSub(topic *topic, callback Handler) bool {
-	reflectCallback := reflect.ValueOf(callback)
-	if topic.asyncHandlers.Contains(reflectCallback) {
+func checkSub(topic *topic, handler Handler) bool {
+	reflectHandler := reflect.ValueOf(handler)
+	if topic.asyncHandlers.Contains(reflectHandler) {
 		return true
 	}
-	return checkSyncSub(topic.syncHandlers, callback, topic.RLocker())
+	return checkSyncSub(topic.syncHandlers, handler, topic.RLocker())
 }
 
-func checkSyncSub(handlers []Handler, callback Handler, rMutex sync.Locker) bool {
+func checkSyncSub(handlers []Handler, handler Handler, rMutex sync.Locker) bool {
 	rMutex.Lock()
 	defer rMutex.Unlock()
-	if findCallback(handlers, callback) > -1 {
+	if findHandler(handlers, handler) > -1 {
 		return true
 	}
 	return false
 }
 
 // 必须在读或写锁保护的情况下调用
-func findCallback(handlers []Handler, callback Handler) int {
+func findHandler(handlers []Handler, handler Handler) int {
 	for i, subFun := range handlers {
-		if isSameFunc(subFun, callback) {
+		if isSameFunc(subFun, handler) {
 			return i
 		}
 	}

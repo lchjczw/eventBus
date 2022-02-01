@@ -20,20 +20,20 @@
    EventBus := eventBus.NewBus(golog.Default)
    ```
 
-2. ###### 实现callback接口
+2. ###### 实现handler接口
 
    ```go
-   type subCallback struct {}
+   type subHandler struct {}
    
-   var callback subCallback
+   var handler subHandler
    
-   func (sub *subCallback) Callback(topic string, events ...interface{}) error {
+   func (sub *subHandler) Handler(topic string, events ...interface{}) error {
    	config.Logger.Infof("event:%s%v", topic, events)
    	return nil
    }
    
-   func initCallback() {
-     callback = subCallback{}
+   func initHandler() {
+     handler = subHandler{}
    }
    
    ```
@@ -42,13 +42,13 @@
 
    ```go
    func sub() {
-     // 同步订阅（收到事件后，按注册顺序同步执行callback）
-     err := EventBus.Subscribe("topic:test", &callback)
+     // 同步订阅（收到事件后，按注册顺序同步执行handler）
+     err := EventBus.Subscribe("topic:test", &handler)
      if err != nil {
        golog.Default.Error(err.Error())
      }
-     // 异步订阅（收到事件后，为每个callback创建Goroutine，异步执行）
-     err := EventBus.SubscribeAsync("topic:test", &callback)
+     // 异步订阅（收到事件后，为每个handler创建Goroutine，异步执行）
+     err := EventBus.SubscribeAsync("topic:test", &handler)
      if err != nil {
        golog.Default.Error(err.Error())
      }
@@ -79,9 +79,9 @@
    ```go
    func unSub() {
      // 取消单个主题的订阅
-     EventBus.UnSubscribe("topic:test", &callback)
+     EventBus.UnSubscribe("topic:test", &handler)
      // 取消全部订阅
-     EventBus.UnSubscribeAll(&callback)
+     EventBus.UnSubscribeAll(&handler)
    }
    ```
 

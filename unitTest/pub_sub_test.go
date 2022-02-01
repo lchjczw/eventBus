@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"gitee.com/super_step/eventBus"
-	"github.com/kataras/golog"
 	"gitee.com/super_step/eventBus/pkg/memstore"
+	"github.com/kataras/golog"
 	"testing"
 )
 
@@ -16,11 +16,11 @@ const (
 
 var (
 	testBus   eventBus.EventBus
-	callbacks []eventBus.Handler
+	handlers []eventBus.Handler
 	testHook  MyHook
 )
 
-type callback struct {
+type handler struct {
 	Name      string
 	Err       bool
 	Recursion bool
@@ -66,29 +66,29 @@ func (cycle *MyHook) Error(topic string, ctx *memstore.Store, err error, args ..
 	cycle.OnErrorFlag = true
 }
 
-func (callback *callback) Handler(topic string, ctx *memstore.Store, args ...interface{}) error {
+func (handler *handler) Handler(topic string, ctx *memstore.Store, args ...interface{}) error {
 	if len(args) == 0 {
-		golog.Default.Infof("%s# %s: %v", callback.Name, topic, "Recursioned")
+		golog.Default.Infof("%s# %s: %v", handler.Name, topic, "Recursioned")
 	} else {
-		golog.Default.Infof("%s# %s: %v", callback.Name, topic, args)
-		if callback.Recursion {
+		golog.Default.Infof("%s# %s: %v", handler.Name, topic, args)
+		if handler.Recursion {
 			testBus.PublishAsync(topic)
 		}
 	}
-	if callback.Err {
-		return errors.New(callback.Name)
+	if handler.Err {
+		return errors.New(handler.Name)
 	}
 	return nil
 }
 
 func TestSub(t *testing.T) {
-	for index, callback := range callbacks {
-		err := testBus.SubscribeSync(syncTopic, callback)
+	for index, handler := range handlers {
+		err := testBus.SubscribeSync(syncTopic, handler)
 		if err != nil {
 			t.Error(index, err.Error())
 			return
 		}
-		err = testBus.SubscribeSync(syncTopic, callback)
+		err = testBus.SubscribeSync(syncTopic, handler)
 		if err == nil {
 			t.Error("重复订阅未报告异常")
 			return
@@ -97,13 +97,13 @@ func TestSub(t *testing.T) {
 }
 
 func TestSubAsync(t *testing.T) {
-	for index, callback := range callbacks {
-		err := testBus.SubscribeAsync(asyncTopic, callback)
+	for index, handler := range handlers {
+		err := testBus.SubscribeAsync(asyncTopic, handler)
 		if err != nil {
 			t.Error(index, err.Error())
 			return
 		}
-		err = testBus.SubscribeAsync(asyncTopic, callback)
+		err = testBus.SubscribeAsync(asyncTopic, handler)
 		if err == nil {
 			t.Error("重复订阅未报告异常")
 			return
@@ -184,54 +184,54 @@ func TestCycle(t *testing.T) {
 }
 
 func TestUnSubAsync(t *testing.T) {
-	for index, callback := range callbacks {
+	for index, handler := range handlers {
 		testBus.PublishAsync(syncTopic, "Sync", "UnSub", index)
 		testBus.WaitAsync()
-		testBus.UnSubscribe(syncTopic, callback)
+		testBus.UnSubscribe(syncTopic, handler)
 	}
 }
 
 func TestUnSubSync(t *testing.T) {
-	for index, callback := range callbacks {
+	for index, handler := range handlers {
 		testBus.PublishAsync(asyncTopic, "Async", "UnSub", index)
 		testBus.WaitAsync()
-		testBus.UnSubscribe(asyncTopic, callback)
+		testBus.UnSubscribe(asyncTopic, handler)
 	}
 }
 
 func TestUnSubAll(t *testing.T) {
 	TestSub(t)
 	TestSubAsync(t)
-	length := len(callbacks)
+	length := len(handlers)
 	for i := 1; i <= length; i++ {
 		testBus.PublishAsync(asyncTopic, "Async", "UnSubAll", i)
 		testBus.PublishAsync(syncTopic, "Sync", "UnSubAll", i)
 		testBus.WaitAsync()
-		testBus.UnSubscribeAll(callbacks[length-i])
+		testBus.UnSubscribeAll(handlers[length-i])
 	}
 
-	for index, callback := range callbacks {
+	for index, handler := range handlers {
 		testBus.PublishAsync(asyncTopic, "Async", "UnSubAll", index)
 		testBus.PublishAsync(syncTopic, "Sync", "UnSubAll", index)
 		testBus.WaitAsync()
-		testBus.UnSubscribeAll(callback)
+		testBus.UnSubscribeAll(handler)
 	}
 }
 
 func TestRecursionSub(t *testing.T) {
-	callbackRecursion := callback{
+	handlerRecursion := handler{
 		Name:      "Recursion",
 		Err:       false,
 		Recursion: true,
 	}
-	err := testBus.SubscribeSync(syncTopic, &callbackRecursion)
+	err := testBus.SubscribeSync(syncTopic, &handlerRecursion)
 	if err != nil {
 		t.Error("Recursion", err.Error())
 		return
 	}
 	testBus.PublishAsync(syncTopic, "Recursion")
 	testBus.WaitAsync()
-	testBus.UnSubscribe(syncTopic, &callbackRecursion)
+	testBus.UnSubscribe(syncTopic, &handlerRecursion)
 }
 
 func TestCloseTopic(t *testing.T) {
@@ -252,17 +252,17 @@ func TestMain(m *testing.M) {
 	testBus = eventBus.NewBus(golog.Default)
 	testHook = MyHook{}
 	for i := 0; i < 4; i++ {
-		callbackStruck := newCallback(fmt.Sprintf("%d", i), i == 2)
-		callbacks = append(callbacks, callbackStruck)
+		handlerStruck := newHandler(fmt.Sprintf("%d", i), i == 2)
+		handlers = append(handlers, handlerStruck)
 	}
 	m.Run()
 	testBus.WaitAsync()
 }
 
-func newCallback(name string, err bool) eventBus.Handler {
-	callbackStruck := callback{
+func newHandler(name string, err bool) eventBus.Handler {
+	handlerStruck := handler{
 		Name: name,
 		Err:  err,
 	}
-	return &callbackStruck
+	return &handlerStruck
 }

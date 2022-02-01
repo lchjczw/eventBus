@@ -31,7 +31,7 @@ func (bus *eventBus) getTopic(topicName string) (resTopic *topic) {
 		resTopic = res.(*topic)
 	} else {
 		resTopic = &topic{
-			syncHandlers:  make([]Callback, 0),
+			syncHandlers:  make([]Handler, 0),
 			asyncHandlers: mapSet.NewSet(),
 			transaction:   false,
 			RWMutex:       sync.RWMutex{},
@@ -41,7 +41,7 @@ func (bus *eventBus) getTopic(topicName string) (resTopic *topic) {
 	return
 }
 
-func isSameFunc(a, b Callback) bool {
+func isSameFunc(a, b Handler) bool {
 	sf1 := reflect.ValueOf(a)
 	sf2 := reflect.ValueOf(b)
 	return sf1.Pointer() == sf2.Pointer()

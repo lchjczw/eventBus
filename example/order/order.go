@@ -23,7 +23,7 @@ func (e *OrderEvent) After(topic string, ctx *memstore.Store, events ...interfac
 func (e *OrderEvent) Error(topic string, ctx *memstore.Store, err error, events ...interface{}) {
 }
 
-func (e *OrderEvent) Callback(topic string, ctx *memstore.Store, events ...interface{}) error {
+func (e *OrderEvent) Handler(topic string, ctx *memstore.Store, events ...interface{}) error {
 	fmt.Printf("topic:%s 订单事件:%v\n", topic, events)
 	return nil
 }

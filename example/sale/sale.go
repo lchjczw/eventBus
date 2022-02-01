@@ -8,7 +8,7 @@ import (
 
 type SaleEvent struct{}
 
-func (s *SaleEvent) Callback(topic string, ctx *memstore.Store, events ...interface{}) error {
+func (s *SaleEvent) Handler(topic string, ctx *memstore.Store, events ...interface{}) error {
 	fmt.Printf("topic:%s 销售单事件:%v\n", topic, events)
 
 	return nil

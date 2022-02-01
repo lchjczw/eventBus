@@ -80,14 +80,14 @@ func (bus *eventBus) waitAsync(topic string, store *memstore.Store, wg *sync.Wai
 // 执行同步订阅回调
 func (bus *eventBus) callSync(topic string, ctx *memstore.Store, args []interface{}, Topic *topic) error {
 	Topic.RLock()
-	syncHandlers := make([]Callback, len(Topic.syncHandlers))
+	syncHandlers := make([]Handler, len(Topic.syncHandlers))
 	if len(Topic.syncHandlers) > 0 {
 		copy(syncHandlers, Topic.syncHandlers)
 	}
 	Topic.RUnlock()
 	var tmpErr error
 	for _, syncHandler := range syncHandlers {
-		err := syncHandler.Callback(topic, ctx, args...)
+		err := syncHandler.Handler(topic, ctx, args...)
 		if err != nil {
 			bus.logger.Errorf("eventBus(sync): %s%v#%s", topic, args, err.Error())
 			if Topic.hook != nil {
@@ -118,7 +118,7 @@ func (bus *eventBus) callAsync(topic string, store *memstore.Store, args []inter
 			for _, arg := range args {
 				params = append(params, reflect.ValueOf(arg))
 			}
-			callbackFunc := callback.MethodByName("Callback")
+			callbackFunc := callback.MethodByName("Handler")
 			result := callbackFunc.Call(params)
 			if len(result) > 0 && !result[0].IsNil() {
 				err, ok := result[0].Interface().(error)

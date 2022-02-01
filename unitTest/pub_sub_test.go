@@ -16,7 +16,7 @@ const (
 
 var (
 	testBus   eventBus.EventBus
-	callbacks []eventBus.Callback
+	callbacks []eventBus.Handler
 	testHook  MyHook
 )
 
@@ -66,7 +66,7 @@ func (cycle *MyHook) Error(topic string, ctx *memstore.Store, err error, args ..
 	cycle.OnErrorFlag = true
 }
 
-func (callback *callback) Callback(topic string, ctx *memstore.Store, args ...interface{}) error {
+func (callback *callback) Handler(topic string, ctx *memstore.Store, args ...interface{}) error {
 	if len(args) == 0 {
 		golog.Default.Infof("%s# %s: %v", callback.Name, topic, "Recursioned")
 	} else {
@@ -259,7 +259,7 @@ func TestMain(m *testing.M) {
 	testBus.WaitAsync()
 }
 
-func newCallback(name string, err bool) eventBus.Callback {
+func newCallback(name string, err bool) eventBus.Handler {
 	callbackStruck := callback{
 		Name: name,
 		Err:  err,

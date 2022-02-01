@@ -35,19 +35,19 @@ type Publisher interface {
 
 type Subscriber interface {
 	// 同步订阅主题
-	SubscribeSync(topic string, callback Callback) error
+	SubscribeSync(topic string, callback Handler) error
 	// 异步订阅主题
-	SubscribeAsync(topic string, callback Callback) error
+	SubscribeAsync(topic string, callback Handler) error
 	// 取消已订阅的主题
-	UnSubscribe(topic string, callback Callback)
+	UnSubscribe(topic string, callback Handler)
 	// 取消所有已订阅的主题
-	UnSubscribeAll(callback Callback)
+	UnSubscribeAll(callback Handler)
 }
 
-// Callback 因为会导致重复订阅,所以必须用interface的形式
-// type Callback = func(string, context.Context, ...interface{}) error
-type Callback interface {
-	Callback(topic string, ctx *memstore.Store, args ...interface{}) error
+// Handler 因为会导致重复订阅,所以必须用interface的形式
+// type Handler = func(string, context.Context, ...interface{}) error
+type Handler interface {
+	Handler(topic string, ctx *memstore.Store, args ...interface{}) error
 }
 
 type Hook interface {
@@ -74,7 +74,7 @@ type topic struct {
 	// 区分异步handlers和同步handlers
 	//  异步handlers用set底层实现
 	//  同步handlers用切片实现
-	syncHandlers  []Callback
+	syncHandlers  []Handler
 	asyncHandlers mapSet.Set
 	transaction   bool
 	//Before    BeforeCallback

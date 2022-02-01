@@ -19,7 +19,7 @@ type event struct {
 	Topic    string
 	Desc     string
 	bus      eventBus.EventBus
-	callBack eventBus.Callback
+	callBack eventBus.Handler
 
 	prent    *event
 	children []*event
@@ -92,7 +92,7 @@ func (a *event) PublishSyncNoWait(args ...interface{}) error {
 
 // SubscribeSync 注册
 // 给callback同时实现hook接口，则直接注入hook
-func (a *event) SubscribeSync(callback eventBus.Callback) error {
+func (a *event) SubscribeSync(callback eventBus.Handler) error {
 	a.callBack = callback
 	err := a.bus.SubscribeSync(a.Key(), callback)
 	if err != nil {
@@ -107,7 +107,7 @@ func (a *event) SubscribeSync(callback eventBus.Callback) error {
 	return nil
 }
 
-func (a *event) SubscribeAsync(callback eventBus.Callback) error {
+func (a *event) SubscribeAsync(callback eventBus.Handler) error {
 	a.callBack = callback
 	return a.bus.SubscribeAsync(a.Key(), callback)
 }
@@ -115,8 +115,8 @@ func (a *event) SubscribeAsync(callback eventBus.Callback) error {
 type Event interface {
 	Event(path, desc string) *event
 	Key() string
-	SubscribeSync(callback eventBus.Callback) error
-	SubscribeAsync(callback eventBus.Callback) error
+	SubscribeSync(callback eventBus.Handler) error
+	SubscribeAsync(callback eventBus.Handler) error
 	PublishAsync(args ...interface{})
 	PublishSync(args ...interface{}) error
 	PublishSyncNoWait(args ...interface{}) error

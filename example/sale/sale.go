@@ -9,8 +9,13 @@ import (
 type SaleEvent struct{}
 
 func (s *SaleEvent) Handler(topic string, ctx *memstore.Store, args ...interface{}) error {
-	fmt.Printf("topic:%s 销售单事件:%v\n", topic, args)
-
+	switch topic {
+	case manage.Sale.CompleteTopic():
+		fmt.Printf("topic:%s 销售单事件:%v\n", topic, args)
+		break
+	case manage.Status.CompleteTopic():
+		break
+	}
 	return nil
 }
 

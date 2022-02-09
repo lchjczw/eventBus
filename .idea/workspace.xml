@@ -5,7 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6ae86e73-e9cd-41c6-bb9c-ff64a94871d5" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/event/event.go" beforeDir="false" afterPath="$PROJECT_DIR$/event/event.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/manage/root.go" beforeDir="false" afterPath="$PROJECT_DIR$/example/manage/event.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/manage/subcribe/subcribe_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/example/manage/subcribe/subcribe_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/example/order/order.go" beforeDir="false" afterPath="$PROJECT_DIR$/example/order/order.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/example/sale/sale.go" beforeDir="false" afterPath="$PROJECT_DIR$/example/sale/sale.go" afterDir="false" />
     </list>
@@ -63,7 +66,7 @@
     <property name="go.modules.go.list.on.any.changes.was.set" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/pkg" />
-    <property name="settings.editor.selected.configurable" value="watcher.settings" />
+    <property name="settings.editor.selected.configurable" value="com.maddyhome.idea.vim.ui.VimEmulationConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -75,29 +78,29 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestEvent in github.com/lchjczw/eventBus/example/manage/subcribe">
-    <configuration name="TestCycleError in gitee.com/super_step/eventBus/unitTest" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Test.BenchmarkSale in github.com/lchjczw/eventBus/example/manage/subcribe">
+    <configuration name="BenchmarkEvent in github.com/lchjczw/eventBus/example/manage/subcribe" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="eventBus" />
-      <working_directory value="$PROJECT_DIR$/unitTest" />
+      <working_directory value="$PROJECT_DIR$/example/manage/subcribe" />
       <root_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
-      <package value="gitee.com/super_step/eventBus/unitTest" />
+      <package value="github.com/lchjczw/eventBus/example/manage/subcribe" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestCycleError\E$" />
+      <framework value="gobench" />
+      <pattern value="^\QBenchmarkEvent\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestEvent in gitee.com/super_step/eventBus/event/example/manage/subcribe" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="BenchmarkSale in github.com/lchjczw/eventBus/example/manage/subcribe" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="eventBus" />
-      <working_directory value="$PROJECT_DIR$/event/example/manage/subcribe" />
+      <working_directory value="$PROJECT_DIR$/example/manage/subcribe" />
       <root_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
-      <package value="gitee.com/super_step/eventBus/event/example/manage/subcribe" />
+      <package value="github.com/lchjczw/eventBus/example/manage/subcribe" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestEvent\E$" />
+      <framework value="gobench" />
+      <pattern value="^\QBenchmarkSale\E$" />
       <method v="2" />
     </configuration>
     <configuration name="TestEvent in gitee.com/super_step/eventBus/example/manage/subcribe" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -138,11 +141,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.BenchmarkSale in github.com/lchjczw/eventBus/example/manage/subcribe" />
+        <item itemvalue="Go Test.BenchmarkEvent in github.com/lchjczw/eventBus/example/manage/subcribe" />
         <item itemvalue="Go Test.TestEvent in github.com/lchjczw/eventBus/example/manage/subcribe" />
         <item itemvalue="Go Test.TestEvent in gitee.com/super_step/eventBus/example/manage/subcribe" />
         <item itemvalue="Go Test.TestSub in gitee.com/super_step/eventBus/unitTest" />
-        <item itemvalue="Go Test.TestEvent in gitee.com/super_step/eventBus/event/example/manage/subcribe" />
-        <item itemvalue="Go Test.TestCycleError in gitee.com/super_step/eventBus/unitTest" />
       </list>
     </recent_temporary>
   </component>
@@ -182,6 +185,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>

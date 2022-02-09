@@ -63,7 +63,7 @@ func (a *event) CompleteTopic() string {
 	}
 	return key
 }
-func (a *event) Event(topic, desc string) *event {
+func (a *event) Event(topic, desc string) Event {
 	if err := a.Check(topic); err != nil {
 		panic(err)
 	}
@@ -112,7 +112,7 @@ func (a *event) SubscribeAsync(handler core.Handler) error {
 }
 
 type Event interface {
-	Event(path, desc string) *event
+	Event(path, desc string) Event
 	CompleteTopic() string // 完整topic
 	SubscribeSync(handler core.Handler) error
 	SubscribeAsync(handler core.Handler) error

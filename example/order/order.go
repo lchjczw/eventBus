@@ -29,7 +29,7 @@ func (e *OrderEvent) Handler(topic string, ctx *memstore.Store, args ...interfac
 }
 
 func Order() {
-	err:= manage.Sale.PublishSyncNoWait(1, "order -> sale")
+	err := manage.Sale.PublishSyncNoWait(1, "order -> sale")
 	if err != nil {
 		fmt.Println(err.Error())
 	}

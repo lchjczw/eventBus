@@ -1,4 +1,4 @@
-package core
+package internal
 
 import (
 	mapSet "github.com/deckarep/golang-set"

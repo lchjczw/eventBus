@@ -1,11 +1,11 @@
 package manage
 
 import (
-	"github.com/lchjczw/eventBus/event"
+	"github.com/lchjczw/eventBus"
 )
 
 var (
-	r1 = event.Root()
+	r1 = eventBus.Root()
 
 	Sale  = r1.Event(`sale`, "销售相关")
 	Status = Sale.Event(`status`,`状态相关`)

@@ -1,14 +1,15 @@
-package event
+package eventBus
 
 import (
 	"errors"
-	"github.com/kataras/golog"
-	"github.com/lchjczw/eventBus/core"
 	"strings"
 	"sync"
+
+	"github.com/kataras/golog"
+	"github.com/lchjczw/eventBus/internal"
 )
 
-var globalBus = core.NewBus(golog.Default)
+var globalBus = internal.NewBus(golog.Default)
 var root = NewRootEvent(globalBus)
 
 func Root() Event {
@@ -18,8 +19,8 @@ func Root() Event {
 type event struct {
 	Topic    string
 	Desc    string
-	bus     core.EventBus
-	handler core.Handler
+	bus     internal.EventBus
+	handler internal.Handler
 
 	prent    *event
 	children []*event
@@ -91,14 +92,14 @@ func (a *event) PublishSyncNoWait(args ...interface{}) error {
 
 // SubscribeSync 注册
 // 给handler同时实现hook接口，则直接注入hook
-func (a *event) SubscribeSync(handler core.Handler) error {
+func (a *event) SubscribeSync(handler internal.Handler) error {
 	a.handler = handler
 	err := a.bus.SubscribeSync(a.CompleteTopic(), handler)
 	if err != nil {
 		return err
 	}
 
-	hook, ok := handler.(core.Hook)
+	hook, ok := handler.(internal.Hook)
 	if ok {
 		a.bus.SetHook(a.CompleteTopic(), hook)
 	}
@@ -106,7 +107,7 @@ func (a *event) SubscribeSync(handler core.Handler) error {
 	return nil
 }
 
-func (a *event) SubscribeAsync(handler core.Handler) error {
+func (a *event) SubscribeAsync(handler internal.Handler) error {
 	a.handler = handler
 	return a.bus.SubscribeAsync(a.CompleteTopic(), handler)
 }
@@ -114,14 +115,14 @@ func (a *event) SubscribeAsync(handler core.Handler) error {
 type Event interface {
 	Event(path, desc string) Event
 	CompleteTopic() string // 完整topic
-	SubscribeSync(handler core.Handler) error
-	SubscribeAsync(handler core.Handler) error
+	SubscribeSync(handler internal.Handler) error
+	SubscribeAsync(handler internal.Handler) error
 	PublishAsync(args ...interface{})
 	PublishSync(args ...interface{}) error
 	PublishSyncNoWait(args ...interface{}) error
 }
 
-func NewRootEvent(bus core.EventBus) Event {
+func NewRootEvent(bus internal.EventBus) Event {
 	if bus == nil {
 		bus = globalBus
 	}

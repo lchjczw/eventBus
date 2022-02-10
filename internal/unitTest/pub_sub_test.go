@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/kataras/golog"
-	"github.com/lchjczw/eventBus/core"
+	"github.com/lchjczw/eventBus/internal"
 	"github.com/lchjczw/eventBus/pkg/memstore"
 	"testing"
 )
@@ -15,8 +15,8 @@ const (
 )
 
 var (
-	testBus  core.EventBus
-	handlers []core.Handler
+	testBus  internal.EventBus
+	handlers []internal.Handler
 	testHook MyHook
 )
 
@@ -249,7 +249,7 @@ func TestMain(m *testing.M) {
 	//	EnableDirectOutput().Hijack(logger.Hijacker).SetSync(false)
 	golog.Default.SetTimeFormat("2006-01-02 15:04:05")
 	golog.Default.SetLevel("debug")
-	testBus = core.NewBus(golog.Default)
+	testBus = internal.NewBus(golog.Default)
 	testHook = MyHook{}
 	for i := 0; i < 4; i++ {
 		handlerStruck := newHandler(fmt.Sprintf("%d", i), i == 2)
@@ -259,7 +259,7 @@ func TestMain(m *testing.M) {
 	testBus.WaitAsync()
 }
 
-func newHandler(name string, err bool) core.Handler {
+func newHandler(name string, err bool) internal.Handler {
 	handlerStruck := handler{
 		Name: name,
 		Err:  err,

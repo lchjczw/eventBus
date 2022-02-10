@@ -1,9 +1,10 @@
 package subcribe
 
 import (
+	"testing"
+
 	"github.com/lchjczw/eventBus/example/order"
 	"github.com/lchjczw/eventBus/example/sale"
-	"testing"
 )
 
 func TestEvent(t *testing.T) {
@@ -15,7 +16,6 @@ func BenchmarkSale(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		sale.Sale()
 	}
-
 }
 
 func BenchmarkOrder(b *testing.B) {

@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6ae86e73-e9cd-41c6-bb9c-ff64a94871d5" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/event.go" beforeDir="false" afterPath="$PROJECT_DIR$/event.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/manage/subcribe/subcribe_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/example/manage/subcribe/subcribe_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,11 +70,11 @@
       <recent name="$PROJECT_DIR$" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/core" />
       <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/core" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.BenchmarkSale in github.com/lchjczw/eventBus/example/manage/subcribe">
+  <component name="RunManager" selected="Go Test.TestEvent in github.com/lchjczw/eventBus/example/manage/subcribe">
     <configuration name="BenchmarkEvent in github.com/lchjczw/eventBus/example/manage/subcribe" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="eventBus" />
       <working_directory value="$PROJECT_DIR$/example/manage/subcribe" />
@@ -136,9 +137,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestEvent in github.com/lchjczw/eventBus/example/manage/subcribe" />
         <item itemvalue="Go Test.BenchmarkSale in github.com/lchjczw/eventBus/example/manage/subcribe" />
         <item itemvalue="Go Test.BenchmarkEvent in github.com/lchjczw/eventBus/example/manage/subcribe" />
-        <item itemvalue="Go Test.TestEvent in github.com/lchjczw/eventBus/example/manage/subcribe" />
         <item itemvalue="Go Test.TestEvent in gitee.com/super_step/eventBus/example/manage/subcribe" />
         <item itemvalue="Go Test.TestSub in gitee.com/super_step/eventBus/unitTest" />
       </list>
@@ -180,6 +181,21 @@
         </entry>
       </map>
     </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="master" />
+                </option>
+              </RecentGroup>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VgoProject">
@@ -189,17 +205,17 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/event/event.go</url>
-          <line>95</line>
+          <url>file://$PROJECT_DIR$/event.go</url>
+          <line>96</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/core/Subscriber.go</url>
+          <url>file://$PROJECT_DIR$/internal/Subscriber.go</url>
           <line>11</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/core/unitTest/pub_sub_test.go</url>
+          <url>file://$PROJECT_DIR$/internal/unitTest/pub_sub_test.go</url>
           <line>115</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
@@ -219,17 +235,17 @@
           <option name="timeStamp" value="11" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/event/event.go</url>
-          <line>82</line>
+          <url>file://$PROJECT_DIR$/event.go</url>
+          <line>83</line>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/core/unitTest/pub_sub_test.go</url>
+          <url>file://$PROJECT_DIR$/internal/unitTest/pub_sub_test.go</url>
           <line>91</line>
           <option name="timeStamp" value="15" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/core/unitTest/pub_sub_test.go</url>
+          <url>file://$PROJECT_DIR$/internal/unitTest/pub_sub_test.go</url>
           <line>99</line>
           <option name="timeStamp" value="16" />
         </line-breakpoint>

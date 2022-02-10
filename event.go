@@ -16,6 +16,16 @@ func Root() Event {
 	return root
 }
 
+type Event interface {
+	Event(path, desc string) Event
+	CompleteTopic() string // 完整topic
+	SubscribeSync(handler internal.Handler) error
+	SubscribeAsync(handler internal.Handler) error
+	PublishAsync(args ...interface{})
+	PublishSync(args ...interface{}) error
+	PublishSyncNoWait(args ...interface{}) error
+}
+
 type event struct {
 	Topic    string
 	Desc    string
@@ -110,16 +120,6 @@ func (a *event) SubscribeSync(handler internal.Handler) error {
 func (a *event) SubscribeAsync(handler internal.Handler) error {
 	a.handler = handler
 	return a.bus.SubscribeAsync(a.CompleteTopic(), handler)
-}
-
-type Event interface {
-	Event(path, desc string) Event
-	CompleteTopic() string // 完整topic
-	SubscribeSync(handler internal.Handler) error
-	SubscribeAsync(handler internal.Handler) error
-	PublishAsync(args ...interface{})
-	PublishSync(args ...interface{}) error
-	PublishSyncNoWait(args ...interface{}) error
 }
 
 func NewRootEvent(bus internal.EventBus) Event {
